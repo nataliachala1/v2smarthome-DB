@@ -1,1 +1,76 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 25a3793e-9b4a-4d24-ab44-fb45271b7d00
+      author: natalia chala
+      labels: "BD-01-dev,ddl,view"
+      comment: Creates views for the auth domain.
+      changes:
+        - sqlFile:
+            path: 001_auth_views.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/05_views/001_auth_views_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 3b9d1103-8a0f-44e6-9a8f-06c2581c25aa
+      author: natalia chala
+      labels: "BD-01-dev,ddl,view"
+      comment: Creates views for the homes domain.
+      changes:
+        - sqlFile:
+            path: 002_homes_views.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/05_views/002_homes_views.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 4b0e2214-9c5b-4d35-8e46-17d838e949aa
+      author: natalia chala
+      labels: "BD-01-dev,ddl,view"
+      comment: Creates views for the devices domain.
+      changes:
+        - sqlFile:
+            path: 003_devices_views.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/05_views/003_devices_views_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 5f7360c2-af0d-4337-985c-75f41da5c626
+      author: natalia chala
+      labels: "BD-01-dev,ddl,view"
+      comment: Creates views for the consumption domain.
+      changes:
+        - sqlFile:
+            path: 004_consumption_views.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/05_views/004_consumption_views_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 83aa13f5-eee5-48f2-9a37-b4ddefd65269
+      author: natalia chala
+      labels: "BD-01-dev,ddl,view"
+      comment: Creates views for the identity_audit domain.
+      changes:
+        - sqlFile:
+            path: 005_audit_views.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/05_views/005_audit_views_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false

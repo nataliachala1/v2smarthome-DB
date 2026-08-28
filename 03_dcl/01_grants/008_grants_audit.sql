@@ -1,8 +1,8 @@
 -- ============================================================
--- GRANTS — Esquema audit
+-- GRANTS — esquema identity_audit
 -- Archivo: 03_dcl/01_grants/008_grants_audit.sql
 -- Descripción: Otorga privilegios sobre los objetos del
---              esquema audit a los roles de PostgreSQL.
+--              esquema identity_audit a los roles de PostgreSQL.
 --              ESPECIAL: smarthome_app solo puede SELECT
 --              e INSERT. Nunca UPDATE ni DELETE para
 --              garantizar la inmutabilidad de los logs
@@ -17,23 +17,23 @@
 --               01_ddl/03_tables/008_create_audit_tables.sql
 -- ============================================================
 
-GRANT USAGE ON SCHEMA audit TO smarthome_admin, smarthome_app, smarthome_readonly;
+GRANT USAGE ON SCHEMA identity_audit TO smarthome_admin, smarthome_app, smarthome_readonly;
 
 -- smarthome_admin: acceso total
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA audit TO smarthome_admin;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA audit TO smarthome_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA identity_audit TO smarthome_admin;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA identity_audit TO smarthome_admin;
 
 -- smarthome_app: solo insertar y consultar (NO UPDATE, NO DELETE)
-GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA audit TO smarthome_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA audit TO smarthome_app;
+GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA identity_audit TO smarthome_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA identity_audit TO smarthome_app;
 
 -- smarthome_readonly: solo lectura
-GRANT SELECT ON ALL TABLES IN SCHEMA audit TO smarthome_readonly;
+GRANT SELECT ON ALL TABLES IN SCHEMA identity_audit TO smarthome_readonly;
 
 -- Aplicar a tablas futuras
-ALTER DEFAULT PRIVILEGES IN SCHEMA audit
+ALTER DEFAULT PRIVILEGES IN SCHEMA identity_audit
   GRANT SELECT, INSERT ON TABLES TO smarthome_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA audit
+ALTER DEFAULT PRIVILEGES IN SCHEMA identity_audit
   GRANT SELECT ON TABLES TO smarthome_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA audit
+ALTER DEFAULT PRIVILEGES IN SCHEMA identity_audit
   GRANT ALL PRIVILEGES ON TABLES TO smarthome_admin;

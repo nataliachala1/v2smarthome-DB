@@ -1,1 +1,61 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: f05791d4-969d-444f-8892-3087e1fab648
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds application roles.
+      changes:
+        - sqlFile:
+            path: 001_insert_roles.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 01234567-89ab-cdef-0123-456789abcdef
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds application permissions.
+      changes:
+        - sqlFile:
+            path: 002_insert_permissions.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 027e2ec6-c62c-46a3-a6a0-e216e1376a93
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds role permissions.
+      changes:
+        - sqlFile:
+            path: 003_insert_roles_permissions.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: dd406ee7-34c0-416d-befe-52254f5cab75
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds device types.
+      changes:
+        - sqlFile:
+            path: 004_insert_tipos_dispositivos.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: c7e9f3ed-f1b2-4038-b673-fd1156ea74eb
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds the initial administrator user.
+      changes:
+        - sqlFile:
+            path: 005_insert_admin_user.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 1c295e79-4d62-479c-b09c-b4749f689408
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds audit records.
+      changes:
+        - sqlFile:
+            path: 006_insert_auditoria_seed.sql
+            relativeToChangelogFile: true
+            stripComments: false

@@ -63,7 +63,7 @@ BEGIN;
   -- --------------------------------------------------------
   -- 3. Registrar inicio de restauración en auditoría
   -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log,
     id_user,
     accion,
@@ -75,7 +75,7 @@ BEGIN;
     created_at
   )
   VALUES (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     :id_admin,
     'restaurar',
     'sync',
@@ -103,7 +103,7 @@ BEGIN;
     created_at
   )
   VALUES (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     :id_admin,
     'automatico',
     'completo',
@@ -127,7 +127,7 @@ BEGIN;
   -- --------------------------------------------------------
   -- 6. Registrar finalización del proceso en auditoría
   -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log,
     id_user,
     accion,
@@ -139,7 +139,7 @@ BEGIN;
     created_at
   )
   VALUES (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     :id_admin,
     'restaurar',
     'sync',

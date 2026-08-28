@@ -90,7 +90,7 @@ BEGIN
       expira_en
     )
     SELECT
-      uuid_generate_v4(),
+      gen_random_uuid(),
       token,
       id_user,
       CASE
@@ -154,7 +154,7 @@ BEGIN
       expira_en
     )
     SELECT
-      uuid_generate_v4(),
+      gen_random_uuid(),
       token,
       id_user,
       'cambio_password',

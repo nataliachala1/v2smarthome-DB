@@ -19,65 +19,65 @@ VALUES
   -- --------------------------------------------------------
   -- Módulo 1 — Gestión de Usuarios y Autenticación
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'usuarios:leer',      'usuarios', 'leer',    'Ver listado y detalle de usuarios',            NOW(), NOW()),
-  (uuid_generate_v4(), 'usuarios:crear',     'usuarios', 'crear',   'Registrar nuevos usuarios',                    NOW(), NOW()),
-  (uuid_generate_v4(), 'usuarios:editar',    'usuarios', 'editar',  'Modificar datos de usuarios',                  NOW(), NOW()),
-  (uuid_generate_v4(), 'usuarios:eliminar',  'usuarios', 'eliminar','Desactivar cuentas de usuarios',               NOW(), NOW()),
-  (uuid_generate_v4(), 'roles:asignar',      'usuarios', 'editar',  'Asignar y modificar roles de usuarios',        NOW(), NOW()),
-  (uuid_generate_v4(), 'usuarios:ver_todos', 'usuarios', 'leer',    'Ver todos los usuarios del sistema',           NOW(), NOW()),
+  (gen_random_uuid(), 'usuarios:leer',      'usuarios', 'leer',    'Ver listado y detalle de usuarios',            NOW(), NOW()),
+  (gen_random_uuid(), 'usuarios:crear',     'usuarios', 'crear',   'Registrar nuevos usuarios',                    NOW(), NOW()),
+  (gen_random_uuid(), 'usuarios:editar',    'usuarios', 'editar',  'Modificar datos de usuarios',                  NOW(), NOW()),
+  (gen_random_uuid(), 'usuarios:eliminar',  'usuarios', 'eliminar','Desactivar cuentas de usuarios',               NOW(), NOW()),
+  (gen_random_uuid(), 'roles:asignar',      'usuarios', 'editar',  'Asignar y modificar roles de usuarios',        NOW(), NOW()),
+  (gen_random_uuid(), 'usuarios:ver_todos', 'usuarios', 'leer',    'Ver todos los usuarios del sistema',           NOW(), NOW()),
 
   -- --------------------------------------------------------
   -- Módulo 2 — Gestión de Hogares y Espacios
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'hogares:leer',       'hogares',  'leer',    'Ver hogares propios',                          NOW(), NOW()),
-  (uuid_generate_v4(), 'hogares:crear',      'hogares',  'crear',   'Registrar nuevos hogares',                     NOW(), NOW()),
-  (uuid_generate_v4(), 'hogares:editar',     'hogares',  'editar',  'Modificar datos del hogar',                    NOW(), NOW()),
-  (uuid_generate_v4(), 'hogares:desactivar', 'hogares',  'eliminar','Desactivar hogares',                           NOW(), NOW()),
-  (uuid_generate_v4(), 'zonas:crear',        'hogares',  'crear',   'Crear zonas dentro de un hogar',               NOW(), NOW()),
-  (uuid_generate_v4(), 'zonas:editar',       'hogares',  'editar',  'Editar zonas existentes',                      NOW(), NOW()),
-  (uuid_generate_v4(), 'zonas:eliminar',     'hogares',  'eliminar','Eliminar zonas del hogar',                     NOW(), NOW()),
-  (uuid_generate_v4(), 'tarifas:configurar', 'hogares',  'editar',  'Configurar tarifas eléctricas',                NOW(), NOW()),
+  (gen_random_uuid(), 'hogares:leer',       'hogares',  'leer',    'Ver hogares propios',                          NOW(), NOW()),
+  (gen_random_uuid(), 'hogares:crear',      'hogares',  'crear',   'Registrar nuevos hogares',                     NOW(), NOW()),
+  (gen_random_uuid(), 'hogares:editar',     'hogares',  'editar',  'Modificar datos del hogar',                    NOW(), NOW()),
+  (gen_random_uuid(), 'hogares:desactivar', 'hogares',  'eliminar','Desactivar hogares',                           NOW(), NOW()),
+  (gen_random_uuid(), 'zonas:crear',        'hogares',  'crear',   'Crear zonas dentro de un hogar',               NOW(), NOW()),
+  (gen_random_uuid(), 'zonas:editar',       'hogares',  'editar',  'Editar zonas existentes',                      NOW(), NOW()),
+  (gen_random_uuid(), 'zonas:eliminar',     'hogares',  'eliminar','Eliminar zonas del hogar',                     NOW(), NOW()),
+  (gen_random_uuid(), 'tarifas:configurar', 'hogares',  'editar',  'Configurar tarifas eléctricas',                NOW(), NOW()),
 
   -- --------------------------------------------------------
   -- Módulo 3 — Gestión de Dispositivos
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'dispositivos:leer',               'dispositivos', 'leer',    'Ver dispositivos registrados',              NOW(), NOW()),
-  (uuid_generate_v4(), 'dispositivos:crear',              'dispositivos', 'crear',   'Registrar nuevos dispositivos',             NOW(), NOW()),
-  (uuid_generate_v4(), 'dispositivos:editar',             'dispositivos', 'editar',  'Modificar configuración de dispositivos',   NOW(), NOW()),
-  (uuid_generate_v4(), 'dispositivos:desactivar',         'dispositivos', 'eliminar','Desactivar dispositivos',                   NOW(), NOW()),
-  (uuid_generate_v4(), 'dispositivos:controlar',          'dispositivos', 'editar',  'Encender/apagar dispositivos remotamente',  NOW(), NOW()),
-  (uuid_generate_v4(), 'dispositivos:configurar_horarios','dispositivos', 'editar',  'Configurar horarios automáticos',           NOW(), NOW()),
-  (uuid_generate_v4(), 'dispositivos:configurar_umbrales','dispositivos', 'editar',  'Configurar umbrales de consumo',            NOW(), NOW()),
-  (uuid_generate_v4(), 'asistente_voz:vincular',          'dispositivos', 'crear',   'Vincular asistentes de voz',               NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:leer',               'dispositivos', 'leer',    'Ver dispositivos registrados',              NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:crear',              'dispositivos', 'crear',   'Registrar nuevos dispositivos',             NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:editar',             'dispositivos', 'editar',  'Modificar configuración de dispositivos',   NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:desactivar',         'dispositivos', 'eliminar','Desactivar dispositivos',                   NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:controlar',          'dispositivos', 'editar',  'Encender/apagar dispositivos remotamente',  NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:configurar_horarios','dispositivos', 'editar',  'Configurar horarios automáticos',           NOW(), NOW()),
+  (gen_random_uuid(), 'dispositivos:configurar_umbrales','dispositivos', 'editar',  'Configurar umbrales de consumo',            NOW(), NOW()),
+  (gen_random_uuid(), 'asistente_voz:vincular',          'dispositivos', 'crear',   'Vincular asistentes de voz',               NOW(), NOW()),
 
   -- --------------------------------------------------------
   -- Módulo 4 — Monitoreo y Consumo Energético
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'consumo:leer',               'consumo', 'leer',  'Ver consumo en tiempo real',                        NOW(), NOW()),
-  (uuid_generate_v4(), 'consumo:reportes',           'consumo', 'leer',  'Generar y ver reportes de consumo',                 NOW(), NOW()),
-  (uuid_generate_v4(), 'consumo:graficos',           'consumo', 'leer',  'Ver gráficos de consumo',                           NOW(), NOW()),
-  (uuid_generate_v4(), 'recomendaciones:leer',       'consumo', 'leer',  'Ver recomendaciones de ahorro',                     NOW(), NOW()),
-  (uuid_generate_v4(), 'recomendaciones:configurar', 'consumo', 'editar','Configurar recomendaciones automáticas',             NOW(), NOW()),
-  (uuid_generate_v4(), 'notificaciones:leer',        'consumo', 'leer',  'Ver notificaciones',                                NOW(), NOW()),
-  (uuid_generate_v4(), 'notificaciones:configurar',  'consumo', 'editar','Configurar preferencias de notificaciones',          NOW(), NOW()),
+  (gen_random_uuid(), 'consumo:leer',               'consumo', 'leer',  'Ver consumo en tiempo real',                        NOW(), NOW()),
+  (gen_random_uuid(), 'consumo:reportes',           'consumo', 'leer',  'Generar y ver reportes de consumo',                 NOW(), NOW()),
+  (gen_random_uuid(), 'consumo:graficos',           'consumo', 'leer',  'Ver gráficos de consumo',                           NOW(), NOW()),
+  (gen_random_uuid(), 'recomendaciones:leer',       'consumo', 'leer',  'Ver recomendaciones de ahorro',                     NOW(), NOW()),
+  (gen_random_uuid(), 'recomendaciones:configurar', 'consumo', 'editar','Configurar recomendaciones automáticas',             NOW(), NOW()),
+  (gen_random_uuid(), 'notificaciones:leer',        'consumo', 'leer',  'Ver notificaciones',                                NOW(), NOW()),
+  (gen_random_uuid(), 'notificaciones:configurar',  'consumo', 'editar','Configurar preferencias de notificaciones',          NOW(), NOW()),
 
   -- --------------------------------------------------------
   -- Módulo 5 — Sincronización de Plataforma
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'sync:manual',       'sync', 'editar','Forzar sincronización manual',            NOW(), NOW()),
-  (uuid_generate_v4(), 'backups:restaurar', 'sync', 'editar','Restaurar información desde backup',      NOW(), NOW()),
-  (uuid_generate_v4(), 'backups:leer',      'sync', 'leer',  'Ver backups disponibles',                 NOW(), NOW()),
+  (gen_random_uuid(), 'sync:manual',       'sync', 'editar','Forzar sincronización manual',            NOW(), NOW()),
+  (gen_random_uuid(), 'backups:restaurar', 'sync', 'editar','Restaurar información desde backup',      NOW(), NOW()),
+  (gen_random_uuid(), 'backups:leer',      'sync', 'leer',  'Ver backups disponibles',                 NOW(), NOW()),
 
   -- --------------------------------------------------------
   -- Módulo 6 — Personalización e Internacionalización
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'config:leer',  'config', 'leer',  'Ver configuración personal',        NOW(), NOW()),
-  (uuid_generate_v4(), 'config:editar','config', 'editar','Modificar configuración personal',   NOW(), NOW()),
+  (gen_random_uuid(), 'config:leer',  'config', 'leer',  'Ver configuración personal',        NOW(), NOW()),
+  (gen_random_uuid(), 'config:editar','config', 'editar','Modificar configuración personal',   NOW(), NOW()),
 
   -- --------------------------------------------------------
   -- Módulo 7 — Auditoría y Trazabilidad
   -- --------------------------------------------------------
-  (uuid_generate_v4(), 'auditoria:leer',    'auditoria', 'leer','Consultar logs de auditoría',      NOW(), NOW()),
-  (uuid_generate_v4(), 'auditoria:exportar','auditoria', 'leer','Exportar registros de auditoría',  NOW(), NOW())
+  (gen_random_uuid(), 'auditoria:leer',    'auditoria', 'leer','Consultar logs de auditoría',      NOW(), NOW()),
+  (gen_random_uuid(), 'auditoria:exportar','auditoria', 'leer','Exportar registros de auditoría',  NOW(), NOW())
 
 ON CONFLICT (nombre) DO NOTHING;

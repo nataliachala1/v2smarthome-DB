@@ -49,12 +49,12 @@ CREATE POLICY home_delete_policy ON homes.home
   );
 
 -- ============================================================
--- RLS: homes.area
+-- RLS: homes.zone
 -- ============================================================
-ALTER TABLE homes.area ENABLE ROW LEVEL SECURITY;
-ALTER TABLE homes.area FORCE ROW LEVEL SECURITY;
+ALTER TABLE homes.zone ENABLE ROW LEVEL SECURITY;
+ALTER TABLE homes.zone FORCE ROW LEVEL SECURITY;
 
-CREATE POLICY area_select_policy ON homes.area
+CREATE POLICY zone_select_policy ON homes.zone
   FOR SELECT TO smarthome_app
   USING (
     id_home IN (
@@ -65,7 +65,7 @@ CREATE POLICY area_select_policy ON homes.area
     AND deleted_at IS NULL
   );
 
-CREATE POLICY area_insert_policy ON homes.area
+CREATE POLICY zone_insert_policy ON homes.zone
   FOR INSERT TO smarthome_app
   WITH CHECK (
     id_home IN (
@@ -75,7 +75,7 @@ CREATE POLICY area_insert_policy ON homes.area
     )
   );
 
-CREATE POLICY area_update_policy ON homes.area
+CREATE POLICY zone_update_policy ON homes.zone
   FOR UPDATE TO smarthome_app
   USING (
     id_home IN (
@@ -86,7 +86,7 @@ CREATE POLICY area_update_policy ON homes.area
     AND deleted_at IS NULL
   );
 
-CREATE POLICY area_delete_policy ON homes.area
+CREATE POLICY zone_delete_policy ON homes.zone
   FOR DELETE TO smarthome_app
   USING (
     id_home IN (

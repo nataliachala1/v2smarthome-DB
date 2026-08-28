@@ -21,7 +21,7 @@
 -- ============================================================
 INSERT INTO auth.role_permission (id_role_permission, id_role, id_permission, created_at)
 SELECT
-  uuid_generate_v4(),
+  gen_random_uuid(),
   'a1b2c3d4-0001-0000-0000-000000000001',
   id_permission,
   NOW()
@@ -37,7 +37,7 @@ ON CONFLICT (id_role, id_permission) DO NOTHING;
 -- ============================================================
 INSERT INTO auth.role_permission (id_role_permission, id_role, id_permission, created_at)
 SELECT
-  uuid_generate_v4(),
+  gen_random_uuid(),
   'a1b2c3d4-0001-0000-0000-000000000002',
   id_permission,
   NOW()
@@ -70,7 +70,7 @@ ON CONFLICT (id_role, id_permission) DO NOTHING;
 -- ============================================================
 INSERT INTO auth.role_permission (id_role_permission, id_role, id_permission, created_at)
 SELECT
-  uuid_generate_v4(),
+  gen_random_uuid(),
   'a1b2c3d4-0001-0000-0000-000000000003',
   id_permission,
   NOW()

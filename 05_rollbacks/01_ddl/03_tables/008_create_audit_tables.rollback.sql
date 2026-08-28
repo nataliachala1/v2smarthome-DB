@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS audit.audit_log CASCADE;
+DROP TABLE IF EXISTS identity_audit.audit_log CASCADE;

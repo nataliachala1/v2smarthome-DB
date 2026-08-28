@@ -2,7 +2,7 @@
 -- FUNCIÓN: fn_audit_log
 -- Archivo: 01_ddl/05_functions/002_fn_audit_log.sql
 -- Descripción: Función genérica que registra automáticamente
---              en audit.audit_log cualquier operación de
+--              en identity_audit.audit_log cualquier operación de
 --              INSERT, UPDATE o DELETE realizada sobre
 --              las tablas críticas del sistema.
 --              Captura el estado anterior y nuevo del registro
@@ -14,7 +14,7 @@
 -- Versión: 1.0.0
 -- Fecha: 2025
 -- Dependencias: 01_schemas, 03_tables/auth,
---               03_tables/audit
+--               03_tables/identity_audit
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION fn_audit_log()
@@ -22,7 +22,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  v_accion         VARCHAR(50);
+  v_action         VARCHAR(50);
   v_datos_ant      JSONB;
   v_datos_nuevos   JSONB;
   v_id_entidad     UUID;
@@ -31,7 +31,7 @@ DECLARE
 BEGIN
 
   IF TG_OP = 'INSERT' THEN
-    v_accion       := 'crear';
+    v_action        := 'crear';
     v_datos_ant    := NULL;
     v_datos_nuevos := to_jsonb(NEW);
     v_id_entidad   := (to_jsonb(NEW)->>'id_' || TG_TABLE_NAME)::UUID;
@@ -41,16 +41,16 @@ BEGIN
     IF (to_jsonb(OLD) ? 'deleted_at')
        AND (to_jsonb(OLD)->>'deleted_at') IS NULL
        AND (to_jsonb(NEW)->>'deleted_at') IS NOT NULL THEN
-      v_accion := 'eliminar';
+      v_action := 'eliminar';
     ELSE
-      v_accion := 'editar';
+      v_action := 'editar';
     END IF;
     v_datos_ant    := to_jsonb(OLD);
     v_datos_nuevos := to_jsonb(NEW);
     v_id_entidad   := (to_jsonb(NEW)->>'id_' || TG_TABLE_NAME)::UUID;
 
   ELSIF TG_OP = 'DELETE' THEN
-    v_accion       := 'eliminar';
+    v_action       := 'eliminar';
     v_datos_ant    := to_jsonb(OLD);
     v_datos_nuevos := NULL;
     v_id_entidad   := (to_jsonb(OLD)->>'id_' || TG_TABLE_NAME)::UUID;
@@ -89,22 +89,22 @@ BEGIN
       - 'ultimo_codigo_hash';
   END IF;
 
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log,
     id_user,
-    accion,
-    modulo,
-    entidad,
-    id_entidad,
+    action,
+    module,
+    entity,
+    id_entity,
     datos_anteriores,
     datos_nuevos,
     resultado,
     created_at
   )
   VALUES (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     v_id_user,
-    v_accion,
+    v_action,
     TG_TABLE_SCHEMA,
     v_entidad,
     v_id_entidad,
@@ -124,4 +124,4 @@ END;
 $$;
 
 COMMENT ON FUNCTION fn_audit_log()
-  IS 'Registra automáticamente en audit.audit_log cualquier INSERT, UPDATE o DELETE sobre tablas críticas. Ofusca campos sensibles antes de guardar.';
+  IS 'Registra automáticamente en identity_audit.audit_log cualquier INSERT, UPDATE o DELETE sobre tablas críticas. Ofusca campos sensibles antes de guardar.';

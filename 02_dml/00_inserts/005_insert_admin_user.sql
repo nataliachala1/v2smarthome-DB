@@ -60,7 +60,7 @@ ON CONFLICT (id_user) DO NOTHING;
 -- ============================================================
 INSERT INTO auth.user_role (id_user_role, id_user, id_role, created_at)
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   'a1b2c3d4-9999-0000-0000-000000000001',
   'a1b2c3d4-0001-0000-0000-000000000001',
   NOW()
@@ -82,7 +82,7 @@ INSERT INTO config.configuration_user (
   updated_at
 )
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   'a1b2c3d4-9999-0000-0000-000000000001',
   'es',
   'claro',

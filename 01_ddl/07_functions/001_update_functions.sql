@@ -23,6 +23,3 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
-COMMENT ON FUNCTION fn_updated_at()
-  IS 'Actualiza automáticamente updated_at al momento del UPDATE. Se reutiliza en todas las tablas del sistema.';

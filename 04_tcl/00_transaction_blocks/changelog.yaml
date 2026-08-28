@@ -1,1 +1,71 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 26602abb-2d39-41ab-8233-ba680a0c2022
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the user registration transaction block.
+      changes:
+        - sqlFile:
+            path: 001_tcl_registro_usuario.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 37713bca-3e4a-42bb-93c0-4d5e6f7g8h9i
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the home registration transaction block.
+      changes:
+        - sqlFile:
+            path: 002_tcl_registro_hogar.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 48824cdb-4f5b-43cc-a4d1-5e6f7g8h9i0j
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the device registration transaction block.
+      changes:
+        - sqlFile:
+            path: 003_tcl_registro_dispositivo.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: a0ceb014-0a72-48fe-a731-ef5b394232ed
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the home deactivation transaction block.
+      changes:
+        - sqlFile:
+            path: 004_tcl_desactivar_hogar.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: b1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the device deactivation transaction block.
+      changes:
+        - sqlFile:
+            path: 005_tcl_desactivar_dispositivo.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 6d9e4240-57e2-4b53-a19b-88bbd97b72df
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the backup restoration transaction block.
+      changes:
+        - sqlFile:
+            path: 006_tcl_restaurar_backup.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: da9b32ab-27d1-465d-a681-a6d07c9d154b
+      author: natalia chala
+      labels: "BD-01-dev,tcl,transaction"
+      comment: Defines the offline synchronization transaction block.
+      changes:
+        - sqlFile:
+            path: 007_tcl_sincronizacion_offline.sql
+            relativeToChangelogFile: true
+            stripComments: false

@@ -21,7 +21,7 @@
 -- Referencia SRS: RF6.1, RF6.2, RF4.5, RF4.6
 -- ============================================================
 CREATE TABLE IF NOT EXISTS config.configuration_user (
-  id_configuration_user    UUID         NOT NULL DEFAULT uuid_generate_v4(),
+  id_configuration_user    UUID         NOT NULL DEFAULT gen_random_uuid(),
   id_user                  UUID         NOT NULL,
   idioma                   VARCHAR(10)  NOT NULL DEFAULT 'es',
   tema                     VARCHAR(10)  NOT NULL DEFAULT 'claro',
@@ -56,8 +56,6 @@ CREATE TABLE IF NOT EXISTS config.configuration_user (
     PRIMARY KEY (id_configuration_user),
   CONSTRAINT uq_configuration_user_id_user
     UNIQUE (id_user),
-  CONSTRAINT fk_configuration_user_user
-    FOREIGN KEY (id_user) REFERENCES auth.user (id_user),
   CONSTRAINT ck_configuration_user_idioma
     CHECK (idioma IN ('es', 'en', 'fr', 'de')),
   CONSTRAINT ck_configuration_user_tema

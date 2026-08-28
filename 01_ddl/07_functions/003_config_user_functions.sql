@@ -58,7 +58,7 @@ BEGIN
       updated_at
     )
     VALUES (
-      uuid_generate_v4(),
+      gen_random_uuid(),
       NEW.id_user,
       'es',           -- idioma por defecto: español
       'claro',        -- tema por defecto: claro

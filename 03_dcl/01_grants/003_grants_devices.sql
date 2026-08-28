@@ -20,7 +20,7 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA devices TO smarthome_admin;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA devices TO smarthome_admin;
 
 -- smarthome_app: lectura y escritura
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA devices TO smarthome_app;
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA devices TO smarthome_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA devices TO smarthome_app;
 
 -- smarthome_readonly: solo lectura
@@ -28,7 +28,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA devices TO smarthome_readonly;
 
 -- Aplicar a tablas futuras
 ALTER DEFAULT PRIVILEGES IN SCHEMA devices
-  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO smarthome_app;
+  GRANT SELECT, INSERT, UPDATE ON TABLES TO smarthome_app;
 ALTER DEFAULT PRIVILEGES IN SCHEMA devices
   GRANT SELECT ON TABLES TO smarthome_readonly;
 ALTER DEFAULT PRIVILEGES IN SCHEMA devices

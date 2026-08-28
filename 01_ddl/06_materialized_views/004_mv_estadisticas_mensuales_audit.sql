@@ -15,15 +15,15 @@
 --
 -- NOTA IMPORTANTE: esta vista es para reportes históricos
 -- mensuales, no para consulta de logs en vivo. Para logs
--- recientes usar audit.vw_logs_recientes (vista normal).
+-- recientes usar identity_audit.vw_logs_recientes (vista normal).
 -- ============================================================
 
 -- ============================================================
--- VISTA MATERIALIZADA: audit.mv_estadisticas_mensuales
+-- VISTA MATERIALIZADA: identity_audit.mv_estadisticas_mensuales
 -- Referencia SRS: RNF8.2, RNF8.4
 -- Frecuencia de refresco recomendada: 1 vez al día
 -- ============================================================
-CREATE MATERIALIZED VIEW IF NOT EXISTS audit.mv_estadisticas_mensuales AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS identity_audit.mv_estadisticas_mensuales AS
 SELECT
   DATE_TRUNC('month', al.created_at)::DATE AS mes,
   al.modulo,
@@ -31,21 +31,21 @@ SELECT
   al.resultado,
   COUNT(*)                                  AS total_registros,
   COUNT(DISTINCT al.id_user)                AS usuarios_distintos
-FROM audit.audit_log al
+FROM identity_audit.audit_log al
 GROUP BY DATE_TRUNC('month', al.created_at), al.modulo, al.accion, al.resultado;
 
 -- Índice único requerido para permitir REFRESH CONCURRENTLY
 CREATE UNIQUE INDEX IF NOT EXISTS uq_mv_estadisticas_mensuales
-  ON audit.mv_estadisticas_mensuales (mes, modulo, accion, resultado);
+  ON identity_audit.mv_estadisticas_mensuales (mes, modulo, accion, resultado);
 
-COMMENT ON MATERIALIZED VIEW audit.mv_estadisticas_mensuales
+COMMENT ON MATERIALIZED VIEW identity_audit.mv_estadisticas_mensuales
   IS 'Estadísticas mensuales de auditoría agregadas por módulo, acción y resultado. Refrescar diariamente. No usar para consulta de logs en vivo.';
 
 -- ============================================================
 -- COMANDO DE REFRESCO
 -- ============================================================
 
--- REFRESH MATERIALIZED VIEW CONCURRENTLY audit.mv_estadisticas_mensuales;
+-- REFRESH MATERIALIZED VIEW CONCURRENTLY identity_audit.mv_estadisticas_mensuales;
 
 -- ============================================================
 -- OPCIÓN A — Programación con pg_cron (recomendada)
@@ -58,7 +58,7 @@ COMMENT ON MATERIALIZED VIEW audit.mv_estadisticas_mensuales
 -- SELECT cron.schedule(
 --   'refresh_mv_estadisticas_mensuales',
 --   '0 2 * * *',  -- todos los días a las 2:00 AM
---   $$REFRESH MATERIALIZED VIEW CONCURRENTLY audit.mv_estadisticas_mensuales$$
+--   $$REFRESH MATERIALIZED VIEW CONCURRENTLY identity_audit.mv_estadisticas_mensuales$$
 -- );
 
 -- ============================================================
@@ -66,7 +66,7 @@ COMMENT ON MATERIALIZED VIEW audit.mv_estadisticas_mensuales
 -- Si pg_cron no está disponible, programar un job
 -- (node-cron, Celery, APScheduler) que ejecute diariamente:
 --
---   REFRESH MATERIALIZED VIEW CONCURRENTLY audit.mv_estadisticas_mensuales;
+--   REFRESH MATERIALIZED VIEW CONCURRENTLY identity_audit.mv_estadisticas_mensuales;
 --
 -- Mismo comando que en la Opción A; solo cambia el disparador.
 -- ============================================================

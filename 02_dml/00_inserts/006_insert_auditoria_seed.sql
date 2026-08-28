@@ -1,7 +1,7 @@
 -- ============================================================
 -- INSERT — Auditoría del seed inicial
 -- Archivo: 02_dml/00_inserts/006_insert_auditoria_seed.sql
--- Descripción: Registra en audit.audit_log la ejecución
+-- Descripción: Registra en identity_audit.audit_log la ejecución
 --              del seed inicial del sistema para garantizar
 --              trazabilidad completa desde el primer arranque.
 -- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
@@ -19,7 +19,7 @@
 --               02_dml/00_inserts/005_insert_admin_user.sql
 -- ============================================================
 
-INSERT INTO audit.audit_log (
+INSERT INTO identity_audit.audit_log (
   id_audit_log,
   id_user,
   accion,
@@ -31,7 +31,7 @@ INSERT INTO audit.audit_log (
 )
 VALUES
   (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     'a1b2c3d4-9999-0000-0000-000000000001',
     'crear',
     'sistema',
@@ -41,7 +41,7 @@ VALUES
     NOW()
   ),
   (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     'a1b2c3d4-9999-0000-0000-000000000001',
     'crear',
     'sistema',
@@ -51,7 +51,7 @@ VALUES
     NOW()
   ),
   (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     'a1b2c3d4-9999-0000-0000-000000000001',
     'crear',
     'sistema',
@@ -61,7 +61,7 @@ VALUES
     NOW()
   ),
   (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     'a1b2c3d4-9999-0000-0000-000000000001',
     'crear',
     'sistema',
@@ -71,7 +71,7 @@ VALUES
     NOW()
   ),
   (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     'a1b2c3d4-9999-0000-0000-000000000001',
     'crear',
     'sistema',

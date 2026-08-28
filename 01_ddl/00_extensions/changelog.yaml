@@ -1,19 +1,16 @@
-databaseChangeLog: []
-
 databaseChangeLog:
   - changeSet:
-      id: fdf7b02c-6eda-4e09-b16c-acbbe203a451
+      id: b1ef8cee-c201-4e68-bc25-bf6e2e7ea028
       author: natalia chala
-      labels: "BD-01-dev,ddl,base,extensions"
-      comment: Enables the uuid-ossp extension for the database baseline.
+      labels: "BD-01-dev,ddl,extension"
+      comment: Enables the pgcrypto extension for UUID generation.
       changes:
         - sqlFile:
             path: 001_enable_uuid_extension.sql
             relativeToChangelogFile: true
-            splitStatements: true
-            stripComments: true
+            stripComments: false
       rollback:
         - sqlFile:
             path: ../../05_rollbacks/01_ddl/00_extensions/001_enable_uuid_extension.rollback.sql
             relativeToChangelogFile: true
-            stripComments: true
+            stripComments: false

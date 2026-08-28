@@ -1,1 +1,1 @@
-DROP MATERIALIZED VIEW IF EXISTS audit.mv_estadisticas_mensuales CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS identity_audit.mv_estadisticas_mensuales CASCADE;

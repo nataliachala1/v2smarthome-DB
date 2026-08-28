@@ -1,1 +1,61 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 54bc85a5-13b3-4dc8-9e31-dd7b663735a1
+      author: natalia chala
+      labels: "BD-01-dev,ddl,materialized-view"
+      comment: Creates the daily homes summary materialized view.
+      changes:
+        - sqlFile:
+            path: 001_mv_resumen_diario_homes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/06_materialized_views/001_mv_resumen_diario_homes_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 67c9d8e0-1a2b-4c3d-8e4f-5a6b7c8d9e0f
+      author: natalia chala
+      labels: "BD-01-dev,ddl,materialized-view"
+      comment: Creates the monthly homes summary materialized view.
+      changes:
+        - sqlFile:
+            path: 002_mv_resumen_mensual_homes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/06_materialized_views/002_mv_resumen_mensual_homes.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 42e91b4b-ef23-4e0d-8e9c-e4ed69a28806
+      author: natalia chala
+      labels: "BD-01-dev,ddl,materialized-view"
+      comment: Creates the device ranking materialized view.
+      changes:
+        - sqlFile:
+            path: 003_mv_raking_devices.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/06_materialized_views/003_mv_raking_devices_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 67f8e9e5-7d86-4c21-8b06-9c6d06e7ef6c
+      author: natalia chala
+      labels: "BD-01-dev,ddl,materialized-view"
+      comment: Creates the monthly audit statistics materialized view.
+      changes:
+        - sqlFile:
+            path: 004_mv_estadisticas_mensuales_audit.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/06_materialized_views/004_mv_estadisticas_mensuales_audit_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false

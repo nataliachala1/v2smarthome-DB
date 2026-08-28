@@ -19,11 +19,11 @@ BEGIN;
 
   -- 1. Insertar dispositivo
   INSERT INTO devices.device (
-    id_device, id_home, id_area, id_type_device,
+    id_device, id_home, id_zone, id_type_device,
     nombre, estado, encendido, protocolo, created_at, updated_at
   )
   VALUES (
-    :id_device, :id_home, :id_area, :id_type_device,
+    :id_device, :id_home, :id_zone, :id_type_device,
     :nombre, 'desconectado', FALSE, :protocolo,
     NOW(), NOW()
   );
@@ -36,7 +36,7 @@ BEGIN;
     capacidad_maxima_w, created_at, updated_at
   )
   VALUES (
-    uuid_generate_v4(), :id_device, :modelo, :fabricante,
+    gen_random_uuid(), :id_device, :modelo, :fabricante,
     :capacidad_maxima_w, NOW(), NOW()
   );
 
@@ -48,19 +48,19 @@ BEGIN;
     estado_nuevo, encendido, origen, id_user, created_at
   )
   VALUES (
-    uuid_generate_v4(), :id_device, NULL,
+    gen_random_uuid(), :id_device, NULL,
     'desconectado', FALSE, 'sistema', :id_user, NOW()
   );
 
   SAVEPOINT sp_historial_creado;
 
   -- 4. Registrar en auditoría
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
     entidad, id_entidad, resultado, detalle, created_at
   )
   VALUES (
-    uuid_generate_v4(), :id_user, 'crear', 'dispositivos',
+    gen_random_uuid(), :id_user, 'crear', 'dispositivos',
     'device', :id_device, 'exitoso',
     CONCAT('Registro de nuevo dispositivo: ', :nombre),
     NOW()

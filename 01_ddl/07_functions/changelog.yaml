@@ -1,1 +1,82 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: d50ff794-183a-4e9c-bba9-d1d3e6c57206
+      author: natalia chala
+      labels: "BD-01-dev,ddl,function"
+      comment: Creates functions for updated_at maintenance.
+      changes:
+        - sqlFile:
+            path: 001_update_functions.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/07_functions/001_update_functions_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: fe3e0fc3-6a61-4dac-b43c-e50a722879c7
+      author: natalia chala
+      labels: "BD-01-dev,ddl,function"
+      comment: Creates functions for audit logging.
+      changes:
+        - sqlFile:
+            path: 002_audit_log_functions.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/07_functions/002_audit_log_functions_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 5cb1bb1e-93c1-4564-ae7a-3fba427610e3
+      author: natalia chala
+      labels: "BD-01-dev,ddl,function"
+      comment: Creates functions for user configuration.
+      changes:
+        - sqlFile:
+            path: 003_config_user_functions.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/07_functions/003_config_user_functions_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 6a8b9c0d-1e2f-3g4h-5i6j-7k8l9m0n1o2p
+      author: natalia chala
+      labels: "BD-01-dev,ddl,function"
+      comment: Creates functions for auth security.
+      changes:
+        - sqlFile:
+            path: 004_auth_security_functions.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/07_functions/004_auth_security_functions.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+
+  - changeSet:
+        id: 6a8b9c0d-1e2f-3g4h-5i6j-7k8l9m0n1p2o
+        author: natalia chala
+        labels: "BD-01-dev,ddl,function"
+        comment: Creates functions for consumption.
+        changes:
+          - sqlFile:
+              path: 005_consumption_partition_functions.sql
+              relativeToChangelogFile: true
+              stripComments: false
+              splitStatements: false
+        rollback:
+          - sqlFile:
+              path: ../../05_rollbacks/01_ddl/07_functions/005_consumption_partition_functions.rollback.sql
+              relativeToChangelogFile: true
+              stripComments: false

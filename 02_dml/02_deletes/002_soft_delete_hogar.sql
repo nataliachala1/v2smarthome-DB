@@ -31,7 +31,7 @@ WHERE id_home    = :id_hogar
 -- ============================================================
 -- 2. Soft delete de zonas del hogar
 -- ============================================================
-UPDATE homes.area
+UPDATE homes.zone
 SET deleted_at = NOW()
 WHERE id_home    = :id_hogar
   AND deleted_at IS NULL;
@@ -50,7 +50,7 @@ WHERE id_home    = :id_hogar
 -- ============================================================
 -- 4. Desactivar horarios de dispositivos del hogar
 -- ============================================================
-UPDATE devices.schedule
+UPDATE devices.device_schedule
 SET
   activo     = FALSE,
   deleted_at = NOW(),
@@ -78,12 +78,12 @@ AND deleted_at IS NULL;
 -- ============================================================
 -- 6. Registrar en auditoría
 -- ============================================================
-INSERT INTO audit.audit_log (
+INSERT INTO identity_audit.audit_log (
   id_audit_log, id_user, accion, modulo,
   entidad, id_entidad, resultado, detalle, created_at
 )
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   :id_usuario,
   'eliminar',
   'hogares',

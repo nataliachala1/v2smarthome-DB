@@ -1,122 +1,92 @@
 -- ============================================================
 -- TABLAS — Esquema homes
--- Archivo: 01_ddl/03_tables/003_create_homes_tables.sql
--- Descripción: Creación de las 4 tablas del esquema homes
---              para gestión de hogares, zonas, tarifas
---              y miembros del hogar
--- Dependencias: 00_extensions, 01_schemas, auth.user
+-- Archivo: 01_ddl/03_tables/002_create_homes_tables.sql
+-- Descripción: Hogares, zonas, tarifas eléctricas y membresías,
+--              alineado con el alcance actualizado (ago-2026).
+-- Convención: columnas en inglés snake_case.
+-- Dependencias: 00_extensions (uuid, btree_gist), 01_schemas, auth.user
 -- ============================================================
 
 -- ============================================================
 -- TABLA: homes.home
--- Descripción: Almacena los hogares registrados en el sistema.
---              Un usuario puede registrar múltiples hogares
--- Referencia SRS: RF2.1, RF2.2, RF2.4
 -- ============================================================
 CREATE TABLE IF NOT EXISTS homes.home (
-    id_home     UUID         NOT NULL DEFAULT uuid_generate_v4(),
-    id_user     UUID         NOT NULL,
-    nombre      VARCHAR(100) NOT NULL,
-    estrato     SMALLINT     NOT NULL,
-    estado      VARCHAR(20)  NOT NULL DEFAULT 'activo',
-    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    deleted_at  TIMESTAMPTZ  NULL,
+  id_home    UUID         NOT NULL DEFAULT gen_random_uuid(),
+  created_by UUID         NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  stratum    SMALLINT     NOT NULL,
+  status     VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
+  created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ  NULL,
 
-    CONSTRAINT pk_home
-        PRIMARY KEY (id_home),
-
-    CONSTRAINT uq_home_nombre
-        UNIQUE (id_user, nombre),
-
-    CONSTRAINT ck_home_estrato
-        CHECK (estrato BETWEEN 1 AND 6),
-
-    CONSTRAINT ck_home_estado
-        CHECK (estado IN ('activo', 'desactivado'))
-);
--- ============================================================
--- TABLA: homes.area
--- Descripción: Representa las zonas o habitaciones dentro
---              de un hogar para organizar dispositivos
---              por ubicación física
--- Referencia SRS: ERF2.1.1
--- ============================================================
-CREATE TABLE IF NOT EXISTS homes.area (
-    id_area     UUID         NOT NULL DEFAULT uuid_generate_v4(),
-    id_home     UUID         NOT NULL,
-    nombre      VARCHAR(100) NOT NULL,
-    tipo        VARCHAR(50)  NULL,
-    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    deleted_at  TIMESTAMPTZ  NULL,
-
-    CONSTRAINT pk_area
-        PRIMARY KEY (id_area),
-
-    CONSTRAINT uq_area_nombre
-        UNIQUE (id_home, nombre),
-
-    CONSTRAINT ck_area_tipo
-        CHECK (
-            tipo IS NULL OR
-            tipo IN ('sala', 'cocina', 'dormitorio', 'baño', 'exterior', 'otro')
-        )
+  CONSTRAINT pk_home         PRIMARY KEY (id_home),
+  CONSTRAINT uq_home_name    UNIQUE (created_by, name),
+  CONSTRAINT ck_home_stratum CHECK (stratum BETWEEN 1 AND 6),
+  CONSTRAINT ck_home_status  CHECK (status IN ('ACTIVE', 'DEACTIVATED'))
 );
 
 -- ============================================================
--- TABLA: homes.tariff
--- Descripción: Almacena las tarifas eléctricas configuradas
---              por hogar para calcular costos y proyecciones
---              de facturación mensual
--- Referencia SRS: RF2.5
+-- TABLA: homes.zone  (antes homes.zone)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS homes.tariff (
-    id_tariff      UUID          NOT NULL DEFAULT uuid_generate_v4(),
-    id_home        UUID          NOT NULL,
-    costo_kwh      NUMERIC(10,4) NOT NULL,
-    moneda         VARCHAR(10)   NOT NULL DEFAULT 'COP',
-    vigente_desde  DATE          NOT NULL,
-    vigente_hasta  DATE          NULL,
-    created_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-    updated_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-    deleted_at     TIMESTAMPTZ   NULL,
+CREATE TABLE IF NOT EXISTS homes.zone (
+  id_zone    UUID         NOT NULL DEFAULT gen_random_uuid(),
+  id_home    UUID         NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  type       VARCHAR(50)  NULL, -- catálogo abierto, sin CHECK rígido (Paso 7)
+  created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ  NULL,
 
-    CONSTRAINT pk_tariff
-        PRIMARY KEY (id_tariff),
-
-    CONSTRAINT ck_tariff_costo
-        CHECK (costo_kwh > 0),
-
-    CONSTRAINT ck_tariff_vigencia
-        CHECK (
-            vigente_hasta IS NULL OR
-            vigente_hasta > vigente_desde
-        )
+  CONSTRAINT pk_zone      PRIMARY KEY (id_zone),
+  CONSTRAINT uq_zone_name UNIQUE (id_home, name)
 );
+
+-- ============================================================
+-- TABLA: homes.electricity_tariff (antes homes.tariff, alcance §16)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS homes.electricity_tariff (
+  id_electricity_tariff     UUID          NOT NULL DEFAULT gen_random_uuid(),
+  id_home       UUID          NOT NULL,
+  price_per_kwh NUMERIC(10,4) NOT NULL,
+  currency      VARCHAR(10)   NOT NULL DEFAULT 'COP',
+  valid_from    DATE          NOT NULL,
+  valid_to      DATE          NULL,
+  created_by    UUID          NOT NULL,
+  created_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+
+  CONSTRAINT pk_electricity_tariff PRIMARY KEY (id_electricity_tariff),
+  CONSTRAINT ck_electricity_tariff_price       CHECK (price_per_kwh > 0),
+  CONSTRAINT ck_electricity_tariff_validity    CHECK (valid_to IS NULL OR valid_to > valid_from)
+);
+
+-- Impide tarifas con periodos superpuestos para el mismo hogar (alcance §16).
+-- Requiere la extensión btree_gist (ver nota al final).
+ALTER TABLE homes.electricity_tariff
+  ADD CONSTRAINT ex_electricity_tariff_no_overlap
+  EXCLUDE USING gist (
+    id_home WITH =,
+    daterange(valid_from, COALESCE(valid_to, 'infinity'::date), '[]') WITH &&
+  );
+
 -- ============================================================
 -- TABLA: homes.home_member
--- Descripción: Gestiona los miembros adicionales de un hogar.
---              Permite que varios usuarios compartan la gestión
---              de un mismo hogar con roles diferenciados
--- Referencia SRS: RF2.3
+-- Rol contextual del hogar (OWNER / MEMBER / GUEST) — alcance §5.2, §6
 -- ============================================================
 CREATE TABLE IF NOT EXISTS homes.home_member (
-    id_home_member UUID        NOT NULL DEFAULT uuid_generate_v4(),
-    id_home        UUID        NOT NULL,
-    id_user        UUID        NOT NULL,
-    rol_en_hogar   VARCHAR(30) NOT NULL DEFAULT 'miembro',
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at     TIMESTAMPTZ NULL,
+  id_home_member UUID        NOT NULL DEFAULT gen_random_uuid(),
+  id_home        UUID        NOT NULL,
+  id_user        UUID        NOT NULL,
+  role           VARCHAR(10) NOT NULL,
+  status         VARCHAR(10) NOT NULL DEFAULT 'PENDING',
+  invited_by     UUID        NULL,
+  invited_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  accepted_at    TIMESTAMPTZ NULL,
+  ended_at       TIMESTAMPTZ NULL, -- se completa al pasar a REVOKED o LEFT
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT pk_home_member
-        PRIMARY KEY (id_home_member),
-
-    CONSTRAINT uq_home_member
-        UNIQUE (id_home, id_user),
-
-    CONSTRAINT ck_home_member_rol
-        CHECK (
-            rol_en_hogar IN ('propietario', 'administrador', 'miembro')
-        )
+  CONSTRAINT pk_home_member        PRIMARY KEY (id_home_member),
+  CONSTRAINT ck_home_member_role   CHECK (role IN ('OWNER', 'MEMBER', 'GUEST')),
+  CONSTRAINT ck_home_member_status CHECK (status IN ('PENDING', 'ACTIVE', 'REVOKED', 'LEFT'))
 );

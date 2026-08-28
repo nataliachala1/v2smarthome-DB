@@ -1,0 +1,11 @@
+ALTER TABLE devices.device_telemetry_raw DROP CONSTRAINT IF EXISTS fk_device_telemetry_raw_device;
+ALTER TABLE devices.voice_assistant_token DROP CONSTRAINT IF EXISTS fk_voice_assistant_token_user;
+ALTER TABLE devices.device_status_history DROP CONSTRAINT IF EXISTS fk_device_status_history_user;
+ALTER TABLE devices.device_status_history DROP CONSTRAINT IF EXISTS fk_device_status_history_device;
+ALTER TABLE devices.threshold_rule DROP CONSTRAINT IF EXISTS fk_threshold_rule_device;
+ALTER TABLE devices.device_schedule DROP CONSTRAINT IF EXISTS fk_device_schedule_device;
+ALTER TABLE devices.manual_device DROP CONSTRAINT IF EXISTS fk_manual_device_device;
+ALTER TABLE devices.smart_device DROP CONSTRAINT IF EXISTS fk_smart_device_device;
+ALTER TABLE devices.device DROP CONSTRAINT IF EXISTS fk_device_type;
+ALTER TABLE devices.device DROP CONSTRAINT IF EXISTS fk_device_zone;
+ALTER TABLE devices.device DROP CONSTRAINT IF EXISTS fk_device_home;

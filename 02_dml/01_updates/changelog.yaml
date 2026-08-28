@@ -1,1 +1,31 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 5137f544-2275-42e5-9d16-45dc604255fb
+      author: natalia chala
+      labels: "BD-01-dev,dml,update"
+      comment: Updates the administrator password.
+      changes:
+        - sqlFile:
+            path: 001_update_admin_password.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 93189d81-1f55-4250-a565-5ac5df2e97ab
+      author: natalia chala
+      labels: "BD-01-dev,dml,update"
+      comment: Updates user status.
+      changes:
+        - sqlFile:
+            path: 002_update_estado_usuario.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 8bceab64-2bc8-4f80-b0be-b72e21dc6411
+      author: natalia chala
+      labels: "BD-01-dev,dml,update"
+      comment: Updates user configuration.
+      changes:
+        - sqlFile:
+            path: 003_update_config_usuario.sql
+            relativeToChangelogFile: true
+            stripComments: false

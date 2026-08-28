@@ -71,3 +71,45 @@ BEGIN
       'Rol de solo lectura para herramientas de reportes, BI o auditorías externas del sistema Smart Home.';
   END IF;
 END $$;
+
+-- ============================================================
+-- ROL: smarthome_ingest
+-- Actor técnico: pipeline de ingesta de telemetría (MQTT).
+-- Solo inserta lecturas crudas de consumo.
+-- ============================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_ingest') THEN
+    CREATE ROLE smarthome_ingest
+      NOLOGIN
+      NOSUPERUSER
+      NOCREATEDB
+      NOCREATEROLE
+      INHERIT
+      NOREPLICATION
+      NOBYPASSRLS;
+    COMMENT ON ROLE smarthome_ingest IS
+      'Rol técnico del pipeline de ingesta MQTT. Solo inserta lecturas de consumo; sin acceso a datos de usuarios ni hogares.';
+  END IF;
+END $$;
+
+-- ============================================================
+-- ROL: smarthome_worker
+-- Actor técnico: jobs programados (agregación de métricas,
+-- generación de recomendaciones, mantenimiento de particiones).
+-- ============================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_worker') THEN
+    CREATE ROLE smarthome_worker
+      NOLOGIN
+      NOSUPERUSER
+      NOCREATEDB
+      NOCREATEROLE
+      INHERIT
+      NOREPLICATION
+      NOBYPASSRLS;
+    COMMENT ON ROLE smarthome_worker IS
+      'Rol técnico de jobs programados: agrega métricas de consumo, genera recomendaciones y mantiene particiones.';
+  END IF;
+END $$;

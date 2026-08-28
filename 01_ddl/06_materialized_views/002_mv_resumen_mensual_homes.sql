@@ -23,28 +23,22 @@
 -- Referencia SRS: RF2.5, RF4.1
 -- Frecuencia de refresco recomendada: 1 vez al día
 -- ============================================================
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS consumption.mv_resumen_mensual_hogar AS
 SELECT
   h.id_home,
   h.nombre                          AS nombre_hogar,
-  DATE_TRUNC('month', c.fecha_lectura)::DATE AS mes,
-  SUM(c.kwh_acumulado)              AS kwh_total_mes,
+  DATE_TRUNC('month', c.read_at)::DATE AS mes,
+  SUM(c.energy_delta_kwh)           AS kwh_total_mes,
   SUM(c.costo_estimado) FILTER (WHERE c.costo_estimado IS NOT NULL) AS costo_total_mes,
   COUNT(*) FILTER (WHERE c.costo_estimado IS NULL)  AS lecturas_sin_costo,
-  AVG(c.watts)                      AS watts_promedio,
-  MAX(c.watts)                      AS watts_maximo,
-  COUNT(DISTINCT DATE(c.fecha_lectura)) AS dias_con_datos
+  AVG(c.power_w)                    AS watts_promedio,
+  MAX(c.power_w)                    AS watts_maximo,
+  COUNT(DISTINCT DATE(c.read_at))   AS dias_con_datos
 FROM consumption.consumption c
 JOIN homes.home               h ON h.id_home = c.id_home
                                  AND h.deleted_at IS NULL
-GROUP BY h.id_home, h.nombre, DATE_TRUNC('month', c.fecha_lectura);
-
--- Índice único requerido para permitir REFRESH CONCURRENTLY
-CREATE UNIQUE INDEX IF NOT EXISTS uq_mv_resumen_mensual_hogar
-  ON consumption.mv_resumen_mensual_hogar (id_home, mes);
-
-COMMENT ON MATERIALIZED VIEW consumption.mv_resumen_mensual_hogar
-  IS 'Resumen mensual de consumo por hogar. Base para proyecciones de factura y reportes mensuales. Refrescar diariamente.';
+GROUP BY h.id_home, h.nombre, DATE_TRUNC('month', c.read_at);
 
 -- ============================================================
 -- COMANDO DE REFRESCO

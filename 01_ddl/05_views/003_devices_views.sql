@@ -34,8 +34,8 @@ SELECT
   td.icono,
   h.id_home,
   h.nombre          AS nombre_hogar,
-  a.id_area,
-  a.nombre          AS nombre_zona,
+  a.id_zone,
+  a.name          AS nombre_zona,
   d.created_at,
   d.updated_at
 FROM devices.device      d
@@ -43,7 +43,7 @@ JOIN devices.type_device td ON td.id_type_device = d.id_type_device
                             AND td.deleted_at     IS NULL
 JOIN homes.home          h  ON h.id_home          = d.id_home
                             AND h.deleted_at       IS NULL
-LEFT JOIN homes.area     a  ON a.id_area           = d.id_area
+LEFT JOIN homes.zone     a  ON a.id_zone           = d.id_zone
                             AND a.deleted_at       IS NULL
 WHERE d.deleted_at IS NULL;
 
@@ -69,7 +69,7 @@ SELECT
 FROM devices.device  d
 JOIN homes.home      h ON h.id_home = d.id_home
                        AND h.deleted_at IS NULL
-LEFT JOIN homes.area a ON a.id_area  = d.id_area
+LEFT JOIN homes.zone a ON a.id_zone  = d.id_zone
                        AND a.deleted_at IS NULL
 WHERE d.estado     = 'desconectado'
   AND d.deleted_at IS NULL;
@@ -96,7 +96,7 @@ SELECT
   s.dias_semana,
   s.created_at,
   s.updated_at
-FROM devices.schedule s
+FROM devices.device_schedule s
 JOIN devices.device   d ON d.id_device = s.id_device
                         AND d.deleted_at IS NULL
 JOIN homes.home       h ON h.id_home   = d.id_home
