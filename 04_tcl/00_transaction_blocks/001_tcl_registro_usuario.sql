@@ -38,7 +38,7 @@ BEGIN;
   -- 2. Asignar rol estándar
   INSERT INTO auth.user_role (id_user_role, id_user, id_role, created_at)
   VALUES (
-    uuid_generate_v4(), :id_user,
+    gen_random_uuid(), :id_user,
     'a1b2c3d4-0001-0000-0000-000000000002',
     NOW()
   );
@@ -51,7 +51,7 @@ BEGIN;
     formato_fecha, formato_hora, moneda, created_at, updated_at
   )
   VALUES (
-    uuid_generate_v4(), :id_user,
+    gen_random_uuid(), :id_user,
     'es', 'claro', 'DD/MM/YYYY', '24h', 'COP',
     NOW(), NOW()
   );
@@ -63,7 +63,7 @@ BEGIN;
     id_recovery_token, id_user, token, tipo, expira_en, created_at
   )
   VALUES (
-    uuid_generate_v4(), :id_user,
+    gen_random_uuid(), :id_user,
     :token_confirmacion,
     'activacion_cuenta',
     NOW() + INTERVAL '24 hours',
@@ -73,12 +73,12 @@ BEGIN;
   SAVEPOINT sp_token_creado;
 
   -- 5. Registrar en auditoría
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
     entidad, id_entidad, resultado, detalle, created_at
   )
   VALUES (
-    uuid_generate_v4(), :id_user, 'crear', 'usuarios',
+    gen_random_uuid(), :id_user, 'crear', 'usuarios',
     'user', :id_user, 'exitoso',
     'Registro de nuevo usuario en el sistema.',
     NOW()

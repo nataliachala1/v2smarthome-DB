@@ -1,20 +1,60 @@
 -- ============================================================
--- POLÍTICAS RLS — Esquema notifications
--- Archivo: 03_dcl/02_policies/004_rls_notifications.sql
--- Descripción: Habilita Row Level Security y define
---              políticas de acceso por fila para las
---              tablas del esquema notifications. Garantiza
---              que cada usuario solo acceda a sus propias
---              notificaciones.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/005_create_notifications_tables.sql
+-- RLS: notifications.alert_rule
 -- ============================================================
+ALTER TABLE notifications.alert_rule ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications.alert_rule FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY alert_rule_select_policy ON notifications.alert_rule
+  FOR SELECT TO smarthome_app
+  USING (
+    id_device IN (
+      SELECT id_device FROM devices.device d
+      WHERE homes.fn_is_home_member(d.id_home)
+        AND d.deleted_at IS NULL
+    )
+    AND deleted_at IS NULL
+  );
+
+CREATE POLICY alert_rule_insert_policy ON notifications.alert_rule
+  FOR INSERT TO smarthome_app
+  WITH CHECK (
+    id_device IN (
+      SELECT id_device FROM devices.device d
+      WHERE homes.fn_is_home_member(d.id_home, ARRAY['OWNER', 'MEMBER'])
+        AND d.deleted_at IS NULL
+    )
+  );
+
+CREATE POLICY alert_rule_update_policy ON notifications.alert_rule
+  FOR UPDATE TO smarthome_app
+  USING (
+    id_device IN (
+      SELECT id_device FROM devices.device d
+      WHERE homes.fn_is_home_member(d.id_home, ARRAY['OWNER', 'MEMBER'])
+        AND d.deleted_at IS NULL
+    )
+    AND deleted_at IS NULL
+  );
+
+CREATE POLICY alert_rule_ingest_select_policy ON notifications.alert_rule
+  FOR SELECT TO smarthome_ingest
+  USING (active AND deleted_at IS NULL);
+
+-- ============================================================
+-- RLS: notifications.alert
+-- ============================================================
+ALTER TABLE notifications.alert ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications.alert FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY alert_select_policy ON notifications.alert
+  FOR SELECT TO smarthome_app
+  USING (
+    homes.fn_is_home_member(id_home)
+  );
+
+CREATE POLICY alert_ingest_insert_policy ON notifications.alert
+  FOR INSERT TO smarthome_ingest
+  WITH CHECK (true);
 
 -- ============================================================
 -- RLS: notifications.notification
@@ -25,25 +65,15 @@ ALTER TABLE notifications.notification FORCE ROW LEVEL SECURITY;
 CREATE POLICY notification_select_policy ON notifications.notification
   FOR SELECT TO smarthome_app
   USING (
-    id_user    = current_setting('app.current_user_id')::UUID
-    AND deleted_at IS NULL
-  );
-
-CREATE POLICY notification_insert_policy ON notifications.notification
-  FOR INSERT TO smarthome_app
-  WITH CHECK (
-    id_user = current_setting('app.current_user_id')::UUID
+    id_user = auth.fn_current_user_id()
   );
 
 CREATE POLICY notification_update_policy ON notifications.notification
   FOR UPDATE TO smarthome_app
   USING (
-    id_user    = current_setting('app.current_user_id')::UUID
-    AND deleted_at IS NULL
+    id_user = auth.fn_current_user_id()
   );
 
-CREATE POLICY notification_delete_policy ON notifications.notification
-  FOR DELETE TO smarthome_app
-  USING (
-    id_user = current_setting('app.current_user_id')::UUID
-  );
+CREATE POLICY notification_ingest_insert_policy ON notifications.notification
+  FOR INSERT TO smarthome_ingest
+  WITH CHECK (true);

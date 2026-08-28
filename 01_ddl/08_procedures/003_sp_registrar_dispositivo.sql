@@ -20,7 +20,7 @@
 
 CREATE OR REPLACE PROCEDURE sp_registrar_dispositivo(
   IN  p_id_home          UUID,
-  IN  p_id_area           UUID,
+  IN  p_id_zone           UUID,
   IN  p_id_type_device    UUID,
   IN  p_nombre            VARCHAR(100),
   IN  p_es_inteligente    BOOLEAN,
@@ -48,9 +48,9 @@ BEGIN
   -- --------------------------------------------------------
   -- 2. Validar que la zona pertenezca al hogar (si se indicó)
   -- --------------------------------------------------------
-  IF p_id_area IS NOT NULL AND NOT EXISTS (
-    SELECT 1 FROM homes.area
-    WHERE id_area    = p_id_area
+  IF p_id_zone IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM homes.zone
+    WHERE id_zone    = p_id_zone
       AND id_home    = p_id_home
       AND deleted_at IS NULL
   ) THEN
@@ -61,14 +61,14 @@ BEGIN
   -- 3. Insertar dispositivo
   --    Dispara: fn_audit_log (registra creación)
   -- --------------------------------------------------------
-  p_id_device := uuid_generate_v4();
+  p_id_device := gen_random_uuid();
 
   INSERT INTO devices.device (
-    id_device, id_home, id_area, id_type_device,
+    id_device, id_home, id_zone, id_type_device,
     nombre, estado, encendido, created_at, updated_at
   )
   VALUES (
-    p_id_device, p_id_home, p_id_area, p_id_type_device,
+    p_id_device, p_id_home, p_id_zone, p_id_type_device,
     p_nombre, 'desconectado', FALSE, NOW(), NOW()
   );
 
@@ -80,14 +80,14 @@ BEGIN
       id_smart_device, id_device, modelo, fabricante, created_at, updated_at
     )
     VALUES (
-      uuid_generate_v4(), p_id_device, p_modelo, p_fabricante, NOW(), NOW()
+      gen_random_uuid(), p_id_device, p_modelo, p_fabricante, NOW(), NOW()
     );
   ELSE
     INSERT INTO devices.manual_device (
       id_manual_device, id_device, created_at, updated_at
     )
     VALUES (
-      uuid_generate_v4(), p_id_device, NOW(), NOW()
+      gen_random_uuid(), p_id_device, NOW(), NOW()
     );
   END IF;
 
@@ -99,7 +99,7 @@ BEGIN
     estado_nuevo, encendido, origen, id_user, created_at
   )
   VALUES (
-    uuid_generate_v4(), p_id_device, NULL,
+    gen_random_uuid(), p_id_device, NULL,
     'desconectado', FALSE, 'sistema', p_id_user, NOW()
   );
 
@@ -119,7 +119,7 @@ COMMENT ON PROCEDURE sp_registrar_dispositivo(UUID, UUID, UUID, VARCHAR, BOOLEAN
 -- ============================================================
 -- CALL sp_registrar_dispositivo(
 --   'a1b2c3d4-0000-0000-0000-000000000001'::UUID,  -- id_home
---   'a1b2c3d4-0000-0000-0000-000000000002'::UUID,  -- id_area
+--   'a1b2c3d4-0000-0000-0000-000000000002'::UUID,  -- id_zone
 --   'a1b2c3d4-0000-0000-0000-000000000003'::UUID,  -- id_type_device
 --   'Lámpara Sala', TRUE, 'Smart Bulb X1', 'Xiaomi',
 --   'a1b2c3d4-9999-0000-0000-000000000001'::UUID,  -- id_user

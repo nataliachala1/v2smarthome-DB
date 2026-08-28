@@ -27,12 +27,12 @@ WHERE id_user    = 'a1b2c3d4-9999-0000-0000-000000000001'
   AND deleted_at IS NULL;
 
 -- Registrar cambio en auditoría
-INSERT INTO audit.audit_log (
+INSERT INTO identity_audit.audit_log (
   id_audit_log, id_user, accion, modulo,
   entidad, id_entidad, resultado, detalle, created_at
 )
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   'a1b2c3d4-9999-0000-0000-000000000001',
   'editar',
   'usuarios',

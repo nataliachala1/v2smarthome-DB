@@ -9,40 +9,6 @@
 -- ============================================================
 
 -- ============================================================
--- TABLA: sync.offline_queue
--- Descripción: Cola de acciones realizadas por el usuario
---              en modo offline que se sincronizan al
---              restablecer la conexión a internet
--- Referencia SRS: RF5.4, RNF4.5
--- ============================================================
-CREATE TABLE IF NOT EXISTS sync.offline_queue (
-  id_offline_queue UUID        NOT NULL DEFAULT uuid_generate_v4(),
-  id_user          UUID        NOT NULL,
-  tipo_accion      VARCHAR(50) NOT NULL,
-  payload          JSONB       NOT NULL,
-  estado           VARCHAR(20) NOT NULL DEFAULT 'pendiente',
-  intentos         SMALLINT    NOT NULL DEFAULT 0,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  procesada_at     TIMESTAMPTZ NULL,
-
-  CONSTRAINT pk_offline_queue           PRIMARY KEY (id_offline_queue),
-  CONSTRAINT ck_offline_queue_tipo      CHECK (tipo_accion IN (
-    'encender_dispositivo',
-    'apagar_dispositivo',
-    'actualizar_config',
-    'vincular_dispositivo',
-    'desvincular_dispositivo',
-    'actualizar_dispositivo'
-  )),
-  CONSTRAINT ck_offline_queue_estado    CHECK (estado IN ('pendiente', 'procesada', 'fallida')),
-  CONSTRAINT ck_offline_queue_intentos  CHECK (intentos >= 0),
-  CONSTRAINT ck_offline_queue_procesada CHECK (
-    (estado = 'pendiente' AND procesada_at IS NULL) OR
-    (estado IN ('procesada', 'fallida') AND procesada_at IS NOT NULL)
-  )
-);
-
--- ============================================================
 -- TABLA: sync.synchronization
 -- Descripción: Registra el historial de sincronizaciones
 --              realizadas entre dispositivos y el servidor,
@@ -50,7 +16,7 @@ CREATE TABLE IF NOT EXISTS sync.offline_queue (
 -- Referencia SRS: RF5.1, RF5.2
 -- ============================================================
 CREATE TABLE IF NOT EXISTS sync.synchronization (
-  id_synchronization           UUID        NOT NULL DEFAULT uuid_generate_v4(),
+  id_synchronization           UUID        NOT NULL DEFAULT gen_random_uuid(),
   id_user                      UUID        NOT NULL,
   tipo                         VARCHAR(20) NOT NULL,
   estado                       VARCHAR(20) NOT NULL,
@@ -80,7 +46,7 @@ CREATE TABLE IF NOT EXISTS sync.synchronization (
 -- Referencia SRS: RF5.3, RNF4.4, RNF5.5
 -- ============================================================
 CREATE TABLE IF NOT EXISTS sync.backup (
-  id_backup      UUID        NOT NULL DEFAULT uuid_generate_v4(),
+  id_backup      UUID        NOT NULL DEFAULT gen_random_uuid(),
   id_user        UUID        NULL,
   tipo           VARCHAR(20) NOT NULL,
   alcance        VARCHAR(20) NOT NULL DEFAULT 'completo',

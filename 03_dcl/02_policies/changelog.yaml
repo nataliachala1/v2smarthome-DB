@@ -1,1 +1,51 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 99445118-5508-4610-9bd6-3b55658e78a6
+      author: natalia chala
+      labels: "BD-01-dev,dcl,rls"
+      comment: Configures row-level security for homes.
+      changes:
+        - sqlFile:
+            path: 001_rls_homes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 99445118-5508-4610-9bd6-3b55658e78a7
+      author: natalia chala
+      labels: "BD-01-dev,dcl,rls"
+      comment: Configures row-level security for devices.
+      changes:
+        - sqlFile:
+            path: 002_rls_devices.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 99445118-5508-4610-9bd6-3b55658e78a8
+      author: natalia chala
+      labels: "BD-01-dev,dcl,rls"
+      comment: Configures row-level security for consumption.
+      changes:
+        - sqlFile:
+            path: 003_rls_consumption.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 99445118-5508-4610-9bd6-3b55658e78a9
+      author: natalia chala
+      labels: "BD-01-dev,dcl,rls"
+      comment: Configures row-level security for notifications.
+      changes:
+        - sqlFile:
+            path: 004_rls_notifications.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 2f1cd769-315a-4039-b44a-35d27e88a298
+      author: natalia chala
+      labels: "BD-01-dev,dcl,rls"
+      comment: Configures row-level security for config.
+      changes:
+        - sqlFile:
+            path: 005_rls_config.sql
+            relativeToChangelogFile: true
+            stripComments: false

@@ -1,46 +1,27 @@
 -- ============================================================
--- POLÍTICAS RLS — Esquema consumption
--- Archivo: 03_dcl/02_policies/003_rls_consumption.sql
--- Descripción: Habilita Row Level Security y define
---              políticas de acceso por fila para las
---              tablas del esquema consumption. Garantiza
---              que cada usuario solo acceda al consumo
---              y recomendaciones de sus propios hogares.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/004_create_consumption_tables.sql
--- ============================================================
-
--- ============================================================
 -- RLS: consumption.consumption
 -- ============================================================
 ALTER TABLE consumption.consumption ENABLE ROW LEVEL SECURITY;
 ALTER TABLE consumption.consumption FORCE ROW LEVEL SECURITY;
 
+-- Usuario final: solo lee lecturas de hogares donde es miembro activo
 CREATE POLICY consumption_select_policy ON consumption.consumption
   FOR SELECT TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
+    homes.fn_is_home_member(id_home)
   );
 
-CREATE POLICY consumption_insert_policy ON consumption.consumption
-  FOR INSERT TO smarthome_app
-  WITH CHECK (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
-  );
+-- Ingesta MQTT: ya acotada por GRANT a solo INSERT. La consistencia
+-- id_device <-> id_home se valida en la capa de ingestión, no aquí.
+CREATE POLICY consumption_ingest_insert_policy ON consumption.consumption
+  FOR INSERT TO smarthome_ingest
+  WITH CHECK (true);
+
+-- Worker: necesita leer todas las lecturas de todos los hogares
+-- para calcular agregados por lotes.
+CREATE POLICY consumption_worker_select_policy ON consumption.consumption
+  FOR SELECT TO smarthome_worker
+  USING (true);
 
 -- ============================================================
 -- RLS: consumption.consumption_metric
@@ -51,22 +32,20 @@ ALTER TABLE consumption.consumption_metric FORCE ROW LEVEL SECURITY;
 CREATE POLICY consumption_metric_select_policy ON consumption.consumption_metric
   FOR SELECT TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
+    homes.fn_is_home_member(id_home)
   );
 
-CREATE POLICY consumption_metric_insert_policy ON consumption.consumption_metric
-  FOR INSERT TO smarthome_app
-  WITH CHECK (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
-  );
+CREATE POLICY consumption_metric_worker_select_policy ON consumption.consumption_metric
+  FOR SELECT TO smarthome_worker
+  USING (true);
+
+CREATE POLICY consumption_metric_worker_insert_policy ON consumption.consumption_metric
+  FOR INSERT TO smarthome_worker
+  WITH CHECK (true);
+
+CREATE POLICY consumption_metric_worker_update_policy ON consumption.consumption_metric
+  FOR UPDATE TO smarthome_worker
+  USING (true);
 
 -- ============================================================
 -- RLS: consumption.recommendation
@@ -77,31 +56,27 @@ ALTER TABLE consumption.recommendation FORCE ROW LEVEL SECURITY;
 CREATE POLICY recommendation_select_policy ON consumption.recommendation
   FOR SELECT TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
+    homes.fn_is_home_member(id_home)
     AND deleted_at IS NULL
   );
 
-CREATE POLICY recommendation_insert_policy ON consumption.recommendation
-  FOR INSERT TO smarthome_app
-  WITH CHECK (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
-  );
-
+-- El usuario final solo puede cambiar el estado (pendiente/implementada/
+-- descartada) de una recomendación de su propio hogar; nunca crearla.
 CREATE POLICY recommendation_update_policy ON consumption.recommendation
   FOR UPDATE TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
+    homes.fn_is_home_member(id_home)
     AND deleted_at IS NULL
   );
+
+CREATE POLICY recommendation_worker_select_policy ON consumption.recommendation
+  FOR SELECT TO smarthome_worker
+  USING (true);
+
+CREATE POLICY recommendation_worker_insert_policy ON consumption.recommendation
+  FOR INSERT TO smarthome_worker
+  WITH CHECK (true);
+
+CREATE POLICY recommendation_worker_update_policy ON consumption.recommendation
+  FOR UPDATE TO smarthome_worker
+  USING (true);

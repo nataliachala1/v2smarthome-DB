@@ -49,12 +49,12 @@ WHERE id_user = :id_usuario
 -- ============================================================
 -- 4. Registrar en auditoría
 -- ============================================================
-INSERT INTO audit.audit_log (
+INSERT INTO identity_audit.audit_log (
   id_audit_log, id_user, accion, modulo,
   entidad, id_entidad, resultado, detalle, created_at
 )
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   :id_admin,
   'eliminar',
   'usuarios',

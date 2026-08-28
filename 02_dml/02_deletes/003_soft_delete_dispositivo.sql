@@ -31,7 +31,7 @@ WHERE id_device  = :id_dispositivo
 -- ============================================================
 -- 2. Desactivar horarios del dispositivo
 -- ============================================================
-UPDATE devices.schedule
+UPDATE devices.device_schedule
 SET
   activo     = FALSE,
   deleted_at = NOW(),
@@ -64,7 +64,7 @@ INSERT INTO devices.device_status_history (
   created_at
 )
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   :id_dispositivo,
   :estado_anterior,
   'desactivado',
@@ -77,12 +77,12 @@ VALUES (
 -- ============================================================
 -- 5. Registrar en auditoría
 -- ============================================================
-INSERT INTO audit.audit_log (
+INSERT INTO identity_audit.audit_log (
   id_audit_log, id_user, accion, modulo,
   entidad, id_entidad, resultado, detalle, created_at
 )
 VALUES (
-  uuid_generate_v4(),
+  gen_random_uuid(),
   :id_usuario,
   'eliminar',
   'dispositivos',

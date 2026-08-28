@@ -54,13 +54,13 @@ CREATE TRIGGER trg_audit_home
   FOR EACH ROW EXECUTE FUNCTION fn_audit_log();
 
 -- Auditar gestión de zonas
-CREATE TRIGGER trg_audit_area
-  AFTER INSERT OR UPDATE ON homes.area
+CREATE TRIGGER trg_audit_zone
+  AFTER INSERT OR UPDATE ON homes.zone
   FOR EACH ROW EXECUTE FUNCTION fn_audit_log();
 
 -- Auditar configuración de tarifas
-CREATE TRIGGER trg_audit_tariff
-  AFTER INSERT OR UPDATE ON homes.tariff
+CREATE TRIGGER trg_audit_electricity_tariff
+  AFTER INSERT OR UPDATE ON homes.electricity_tariff
   FOR EACH ROW EXECUTE FUNCTION fn_audit_log();
 
 -- Auditar miembros del hogar
@@ -78,8 +78,8 @@ CREATE TRIGGER trg_audit_device
   FOR EACH ROW EXECUTE FUNCTION fn_audit_log();
 
 -- Auditar configuración de horarios automáticos
-CREATE TRIGGER trg_audit_schedule
-  AFTER INSERT OR UPDATE ON devices.schedule
+CREATE TRIGGER trg_audit_device_schedule
+  AFTER INSERT OR UPDATE ON devices.device_schedule
   FOR EACH ROW EXECUTE FUNCTION fn_audit_log();
 
 -- Auditar configuración de umbrales de consumo

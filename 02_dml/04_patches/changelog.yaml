@@ -1,1 +1,41 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: b27860dd-c262-43cb-bb98-b3b5b3f35093
+      author: natalia chala
+      labels: "BD-01-dev,dml,patch"
+      comment: Resets failed login attempts.
+      changes:
+        - sqlFile:
+            path: 001_patch_reset_intentos_fallidos.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p
+      author: natalia chala
+      labels: "BD-01-dev,dml,patch"
+      comment: Invalidates expired tokens.
+      changes:
+        - sqlFile:
+            path: 002_patch_invalidar_tokens_expirados.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q
+      author: natalia chala
+      labels: "BD-01-dev,dml,patch"
+      comment: Purges expired blacklist entries.
+      changes:
+        - sqlFile:
+            path: 003_patch_purgar_blacklist.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r
+      author: natalia chala
+      labels: "BD-01-dev,dml,patch"
+      comment: Expires recovery tokens.
+      changes:
+        - sqlFile:
+            path: 004_patch_recovery_tokens_expirados.sql
+            relativeToChangelogFile: true
+            stripComments: false

@@ -63,7 +63,7 @@ BEGIN
   -- 3. Crear backup de seguridad del estado actual
   --    Dispara: fn_audit_log (registra creación del backup)
   -- --------------------------------------------------------
-  p_id_backup_seguridad := uuid_generate_v4();
+  p_id_backup_seguridad := gen_random_uuid();
 
   INSERT INTO sync.backup (
     id_backup, id_user, tipo, alcance,
@@ -81,12 +81,12 @@ BEGIN
   --    (evento informativo, no cubierto por trigger porque
   --    no corresponde a un INSERT/UPDATE sobre sync.backup)
   -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
     entidad, id_entidad, resultado, detalle, created_at
   )
   VALUES (
-    uuid_generate_v4(), p_id_admin, 'restaurar', 'sync',
+    gen_random_uuid(), p_id_admin, 'restaurar', 'sync',
     'backup', p_id_backup_a_restaurar, 'exitoso',
     CONCAT('Inicio de restauración de backup. Motivo: ', p_motivo),
     NOW()
@@ -104,12 +104,12 @@ BEGIN
   -- --------------------------------------------------------
   -- 6. Registrar finalización del proceso
   -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
     entidad, id_entidad, resultado, detalle, created_at
   )
   VALUES (
-    uuid_generate_v4(), p_id_admin, 'restaurar', 'sync',
+    gen_random_uuid(), p_id_admin, 'restaurar', 'sync',
     'backup', p_id_backup_a_restaurar, 'exitoso',
     'Restauración registrada exitosamente. Backup de seguridad creado previamente.',
     NOW()

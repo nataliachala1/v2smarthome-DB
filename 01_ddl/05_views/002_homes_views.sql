@@ -32,12 +32,12 @@ SELECT
   h.estado,
   h.created_at,
   h.updated_at,
-  COUNT(DISTINCT a.id_area)     AS total_zonas,
+  COUNT(DISTINCT a.id_zone)     AS total_zonas,
   COUNT(DISTINCT d.id_device)   AS total_dispositivos
 FROM homes.home         h
 JOIN auth.user          u  ON u.id_user    = h.id_user
                            AND u.deleted_at IS NULL
-LEFT JOIN homes.area    a  ON a.id_home    = h.id_home
+LEFT JOIN homes.zone    a  ON a.id_home    = h.id_home
                            AND a.deleted_at IS NULL
 LEFT JOIN devices.device d ON d.id_home    = h.id_home
                            AND d.deleted_at IS NULL
@@ -67,7 +67,7 @@ COMMENT ON VIEW homes.vw_hogares_activos
 -- ============================================================
 CREATE OR REPLACE VIEW homes.vw_zonas_con_dispositivos AS
 SELECT
-  a.id_area,
+  a.id_zone,
   a.id_home,
   h.nombre                        AS nombre_hogar,
   a.nombre                        AS nombre_zona,
@@ -80,15 +80,15 @@ SELECT
   COALESCE(
     SUM(d.consumo_actual_w), 0
   )                               AS consumo_actual_zona_w
-FROM homes.area          a
+FROM homes.zone          a
 JOIN homes.home          h  ON h.id_home    = a.id_home
                             AND h.deleted_at IS NULL
-LEFT JOIN devices.device d  ON d.id_area    = a.id_area
+LEFT JOIN devices.device d  ON d.id_zone    = a.id_zone
                             AND d.deleted_at IS NULL
                             AND d.estado     = 'conectado'
 WHERE a.deleted_at IS NULL
 GROUP BY
-  a.id_area,
+  a.id_zone,
   a.id_home,
   h.nombre,
   a.nombre,
@@ -106,14 +106,14 @@ COMMENT ON VIEW homes.vw_zonas_con_dispositivos
 -- ============================================================
 CREATE OR REPLACE VIEW homes.vw_tarifas_vigentes AS
 SELECT
-  t.id_tariff,
+  t.id_electricity_tariff,
   t.id_home,
   h.nombre          AS nombre_hogar,
   h.id_user,
   t.costo_kwh,
   t.moneda,
   t.vigente_desde
-FROM homes.tariff   t
+FROM homes.electricity_tariff   t
 JOIN homes.home     h  ON h.id_home    = t.id_home
                        AND h.deleted_at IS NULL
 WHERE t.deleted_at    IS NULL
@@ -137,11 +137,9 @@ CREATE OR REPLACE VIEW homes.vw_miembros_hogar AS
 SELECT
   hm.id_home_member,
   hm.id_home,
-  h.nombre          AS nombre_hogar,
+  h.name          AS nombre_hogar,
   h.id_user         AS id_propietario,
   hm.id_user,
-  u.nombre          AS miembro_nombre,
-  u.apellido        AS miembro_apellido,
   u.email           AS miembro_email,
   hm.rol_en_hogar,
   hm.created_at     AS fecha_vinculacion
@@ -174,7 +172,7 @@ SELECT
   u.email                           AS propietario_email,
   t.costo_kwh                       AS tarifa_vigente,
   t.moneda,
-  COUNT(DISTINCT a.id_area)         AS total_zonas,
+  COUNT(DISTINCT a.id_zone)         AS total_zonas,
   COUNT(DISTINCT d.id_device)       AS total_dispositivos,
   COUNT(
     DISTINCT CASE
@@ -194,14 +192,14 @@ SELECT
 FROM homes.home           h
 JOIN auth.user            u  ON u.id_user      = h.id_user
                              AND u.deleted_at   IS NULL
-LEFT JOIN homes.tariff    t  ON t.id_home       = h.id_home
+LEFT JOIN homes.electricity_tariff    t  ON t.id_home       = h.id_home
                              AND t.deleted_at    IS NULL
                              AND t.vigente_desde <= CURRENT_DATE
                              AND (
                                t.vigente_hasta IS NULL OR
                                t.vigente_hasta >= CURRENT_DATE
                              )
-LEFT JOIN homes.area      a  ON a.id_home       = h.id_home
+LEFT JOIN homes.zone      a  ON a.id_home       = h.id_home
                              AND a.deleted_at    IS NULL
 LEFT JOIN devices.device  d  ON d.id_home       = h.id_home
                              AND d.deleted_at    IS NULL
@@ -209,11 +207,11 @@ WHERE h.deleted_at IS NULL
   AND h.estado     = 'activo'
 GROUP BY
   h.id_home,
-  h.nombre,
+  h.name,
   h.estrato,
   h.estado,
   u.id_user,
-  u.nombre,
+  u.name,
   u.email,
   t.costo_kwh,
   t.moneda;

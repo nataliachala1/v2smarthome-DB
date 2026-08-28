@@ -1,65 +1,66 @@
--- ============================================================
--- POLÍTICAS RLS — Esquema devices
--- Archivo: 03_dcl/02_policies/002_rls_devices.sql
--- Descripción: Habilita Row Level Security y define
---              políticas de acceso por fila para las
---              tablas del esquema devices. Garantiza que
---              cada usuario solo acceda a los dispositivos
---              de sus propios hogares.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/003_create_devices_tables.sql
--- ============================================================
+-- Habilitar RLS en la tabla devices.device_schedule
+ALTER TABLE devices.device_schedule ENABLE ROW LEVEL SECURITY;
+ALTER TABLE devices.device_schedule FORCE ROW LEVEL SECURITY;
 
--- ============================================================
--- RLS: devices.device
--- ============================================================
-ALTER TABLE devices.device ENABLE ROW LEVEL SECURITY;
-ALTER TABLE devices.device FORCE ROW LEVEL SECURITY;
+-- Función helper (ya debe existir; si no, créala)
+CREATE OR REPLACE FUNCTION auth.current_user_id()
+RETURNS UUID
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT NULLIF(current_setting('app.current_user_id', TRUE), '')::UUID;
+$$;
 
-CREATE POLICY device_select_policy ON devices.device
+-- Política SELECT (solo miembros activos del hogar)
+CREATE POLICY schedule_select_policy ON devices.device_schedule
   FOR SELECT TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
+    EXISTS (
+      SELECT 1 FROM homes.home_member hm
+      WHERE hm.id_home = schedule.id_home
+        AND hm.id_user = auth.current_user_id()
+        AND hm.status = 'ACTIVE'
     )
     AND deleted_at IS NULL
   );
 
-CREATE POLICY device_insert_policy ON devices.device
+-- Política INSERT (solo OWNER o MEMBER)
+CREATE POLICY schedule_insert_policy ON devices.device_schedule
   FOR INSERT TO smarthome_app
   WITH CHECK (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
+    EXISTS (
+      SELECT 1 FROM homes.home_member hm
+      WHERE hm.id_home = schedule.id_home
+        AND hm.id_user = auth.current_user_id()
+        AND hm.status = 'ACTIVE'
+        AND hm.role IN ('OWNER', 'MEMBER')
     )
   );
 
-CREATE POLICY device_update_policy ON devices.device
+-- Política UPDATE (solo OWNER o MEMBER)
+CREATE POLICY schedule_update_policy ON devices.device_schedule
   FOR UPDATE TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
+    EXISTS (
+      SELECT 1 FROM homes.home_member hm
+      WHERE hm.id_home = schedule.id_home
+        AND hm.id_user = auth.current_user_id()
+        AND hm.status = 'ACTIVE'
+        AND hm.role IN ('OWNER', 'MEMBER')
     )
     AND deleted_at IS NULL
   );
 
-CREATE POLICY device_delete_policy ON devices.device
+-- Política DELETE (solo OWNER)
+CREATE POLICY schedule_delete_policy ON devices.device_schedule
   FOR DELETE TO smarthome_app
   USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
+    EXISTS (
+      SELECT 1 FROM homes.home_member hm
+      WHERE hm.id_home = schedule.id_home
+        AND hm.id_user = auth.current_user_id()
+        AND hm.status = 'ACTIVE'
+        AND hm.role = 'OWNER'
     )
+    AND deleted_at IS NULL
   );

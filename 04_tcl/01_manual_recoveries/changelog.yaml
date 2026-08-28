@@ -1,1 +1,41 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: cb280b39-8dfd-43e0-b4a0-8d260ad46ec3
+      author: natalia chala
+      labels: "BD-01-dev,tcl,recovery"
+      comment: Defines the blocked user recovery script.
+      changes:
+        - sqlFile:
+            path: 001_recovery_usuario_bloqueado.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 04ad6d88-2518-464f-b0e9-49957fb20762
+      author: natalia chala
+      labels: "BD-01-dev,tcl,recovery"
+      comment: Defines the deactivated home recovery script.
+      changes:
+        - sqlFile:
+            path: 002_recovery_hogar_desactivado.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 04ad6d88-2518-464f-b0e9-49957fb20763
+      author: natalia chala
+      labels: "BD-01-dev,tcl,recovery"
+      comment: Defines the deactivated device recovery script.
+      changes:
+        - sqlFile:
+            path: 003_recovery_dispositivo_desactivado.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: c36bb9da-6979-4621-b1ac-17a3cc3c6730
+      author: natalia chala
+      labels: "BD-01-dev,tcl,recovery"
+      comment: Defines the failed restoration recovery script.
+      changes:
+        - sqlFile:
+            path: 004_recovery_restauracion_fallida.sql
+            relativeToChangelogFile: true
+            stripComments: false

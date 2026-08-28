@@ -32,18 +32,18 @@ BEGIN;
     id_home_member, id_home, id_user, rol_en_hogar, created_at
   )
   VALUES (
-    uuid_generate_v4(), :id_home, :id_user, 'propietario', NOW()
+    gen_random_uuid(), :id_home, :id_user, 'propietario', NOW()
   );
 
   SAVEPOINT sp_miembro_registrado;
 
   -- 3. Registrar en auditoría
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
     entidad, id_entidad, resultado, detalle, created_at
   )
   VALUES (
-    uuid_generate_v4(), :id_user, 'crear', 'hogares',
+    gen_random_uuid(), :id_user, 'crear', 'hogares',
     'home', :id_home, 'exitoso',
     CONCAT('Registro de nuevo hogar: ', :nombre),
     NOW()

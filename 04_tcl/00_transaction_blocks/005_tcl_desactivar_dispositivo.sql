@@ -44,7 +44,7 @@ BEGIN;
   --    Dispara: fn_audit_log por cada horario
   --    Dispara: fn_updated_at por cada horario
   -- --------------------------------------------------------
-  UPDATE devices.schedule
+  UPDATE devices.device_schedule
   SET
     activo     = FALSE,
     deleted_at = NOW(),
@@ -83,7 +83,7 @@ BEGIN;
     created_at
   )
   VALUES (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     :id_device,
     :estado_anterior,
     'desactivado',
@@ -100,7 +100,7 @@ BEGIN;
   --    (evento agregado que el trigger individual
   --    de devices.device no cubre completamente)
   -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log,
     id_user,
     accion,
@@ -112,7 +112,7 @@ BEGIN;
     created_at
   )
   VALUES (
-    uuid_generate_v4(),
+    gen_random_uuid(),
     :id_user,
     'eliminar',
     'dispositivos',

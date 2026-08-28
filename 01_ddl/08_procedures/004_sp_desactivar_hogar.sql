@@ -9,7 +9,7 @@
 --              trigger (fn_audit_log); las demás tablas
 --              afectadas no tienen trigger de auditoría
 --              individual, por lo que se registra un
---              resumen manual en audit.audit_log
+--              resumen manual en identity_audit.audit_log
 -- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
 --        Kevin Stiven López Amaya
 -- Institución: SENA — Análisis y Desarrollo de Software
@@ -18,7 +18,7 @@
 -- Fecha: 2025
 -- Referencia SRS: RF2.4
 -- Dependencias: 03_tables/homes, 03_tables/devices,
---               03_tables/audit, 06_triggers/002_trg_audit_log
+--               03_tables/identity_audit, 06_triggers/002_trg_audit_log
 -- ============================================================
 
 CREATE OR REPLACE PROCEDURE sp_desactivar_hogar(
@@ -60,7 +60,7 @@ BEGIN
   -- 3. Desactivar zonas del hogar
   --    Dispara: fn_audit_log por cada zona (registra edición)
   -- --------------------------------------------------------
-  UPDATE homes.area
+  UPDATE homes.zone
   SET deleted_at = NOW(), updated_at = NOW()
   WHERE id_home    = p_id_home
     AND deleted_at IS NULL;
@@ -87,7 +87,7 @@ BEGIN
   -- 5. Desactivar horarios de los dispositivos del hogar
   --    Dispara: fn_audit_log por cada horario
   -- --------------------------------------------------------
-  UPDATE devices.schedule
+  UPDATE devices.device_schedule
   SET
     activo     = FALSE,
     deleted_at = NOW(),
@@ -116,12 +116,12 @@ BEGIN
   --    (no cubierto por trigger porque es un evento agregado,
   --    no una operación individual sobre una sola tabla)
   -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
+  INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
     entidad, id_entidad, resultado, detalle, created_at
   )
   VALUES (
-    uuid_generate_v4(), p_id_user, 'eliminar', 'hogares',
+    gen_random_uuid(), p_id_user, 'eliminar', 'hogares',
     'home', p_id_home, 'exitoso',
     CONCAT(
       'Desactivación completa del hogar "', v_nombre_hogar,

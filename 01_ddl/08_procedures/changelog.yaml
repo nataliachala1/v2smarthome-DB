@@ -1,1 +1,113 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 297a858b-c24a-49c3-b466-13f083341e1e
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the user registration procedure.
+      changes:
+        - sqlFile:
+            path: 001_sp_registrar_usuario.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/001_sp_registrar_usuario_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 3a8b9c0d-1e2f-3g4h-5i6j-7k8l9m0n1o2p
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the home registration procedure.
+      changes:
+        - sqlFile:
+            path: 002_sp_registrar_hogar.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/002_sp_registrar_hogar_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 4b9c0d1e-2f3g-4h5i-6j7k-8l9m0n1o2p3
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the device registration procedure.
+      changes:
+        - sqlFile:
+            path: 003_sp_registrar_dispositivo.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/003_sp_registrar_dispositivo_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 5c0d1e2f-3g4h-5i6j-7k8l-9m0n1o2p3q4
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the home deactivation procedure.
+      changes:
+        - sqlFile:
+            path: 004_sp_desactivar_hogar.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/004_sp_desactivar_hogar_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 6d1e2f3g-4h5i-6j7k-8l9m-0n1o2p3q4r5
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the device deactivation procedure.
+      changes:
+        - sqlFile:
+            path: 005_sp_desactivar_dispositivo.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/005_sp_desactivar_dispositivo_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 7e2f3g4h-5i6j-7k8l-9m0n-1o2p3q4r5s6
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the backup restoration procedure.
+      changes:
+        - sqlFile:
+            path: 006_sp_restaurar_backup.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/006_sp_restaurar_backup_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 8f3g4h5i-6j7k-8l9m-0n1o-2p3q4r5s6t7
+      author: natalia chala
+      labels: "BD-01-dev,ddl,procedure"
+      comment: Creates the offline queue processing procedure.
+      changes:
+        - sqlFile:
+            path: 007_sp_cola_offline.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/08_procedures/007_sp_cola_offline_rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false

@@ -42,7 +42,7 @@ BEGIN
   -- 2. Insertar hogar
   --    Dispara: fn_audit_log (registra creación)
   -- --------------------------------------------------------
-  p_id_home := uuid_generate_v4();
+  p_id_home := gen_random_uuid();
 
   INSERT INTO homes.home (
     id_home, id_user, nombre, estrato, estado, created_at, updated_at
@@ -58,7 +58,7 @@ BEGIN
     id_home_member, id_home, id_user, rol_en_hogar, created_at
   )
   VALUES (
-    uuid_generate_v4(), p_id_home, p_id_user, 'propietario', NOW()
+    gen_random_uuid(), p_id_home, p_id_user, 'propietario', NOW()
   );
 
 EXCEPTION

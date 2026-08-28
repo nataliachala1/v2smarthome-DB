@@ -30,41 +30,41 @@ CREATE INDEX IF NOT EXISTS idx_home_id_user_nombre
   WHERE deleted_at IS NULL;
 
 -- ============================================================
--- TABLA: homes.area
+-- TABLA: homes.zone
 -- ============================================================
 
 -- Búsqueda de zonas por hogar
-CREATE INDEX IF NOT EXISTS idx_area_id_home
-  ON homes.area (id_home)
+CREATE INDEX IF NOT EXISTS idx_zone_id_home
+  ON homes.zone (id_home)
   WHERE deleted_at IS NULL;
 
 -- Filtrado por tipo de zona (sala, cocina, dormitorio, etc.)
-CREATE INDEX IF NOT EXISTS idx_area_tipo
-  ON homes.area (tipo)
+CREATE INDEX IF NOT EXISTS idx_zone_tipo
+  ON homes.zone (tipo)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: hogar + nombre (validación de nombre único por hogar)
-CREATE INDEX IF NOT EXISTS idx_area_id_home_nombre
-  ON homes.area (id_home, nombre)
+CREATE INDEX IF NOT EXISTS idx_zone_id_home_nombre
+  ON homes.zone (id_home, nombre)
   WHERE deleted_at IS NULL;
 
 -- ============================================================
--- TABLA: homes.tariff
+-- TABLA: homes.electricity_tariff
 -- ============================================================
 
 -- Búsqueda de tarifas por hogar
-CREATE INDEX IF NOT EXISTS idx_tariff_id_home
-  ON homes.tariff (id_home)
+CREATE INDEX IF NOT EXISTS idx_electricity_tariff_id_home
+  ON homes.electricity_tariff (id_home)
   WHERE deleted_at IS NULL;
 
 -- Filtrado por vigencia de tarifa (tarifa activa actual)
-CREATE INDEX IF NOT EXISTS idx_tariff_vigente_desde
-  ON homes.tariff (id_home, vigente_desde DESC)
+CREATE INDEX IF NOT EXISTS idx_electricity_tariff_vigente_desde
+  ON homes.electricity_tariff (id_home, vigente_desde DESC)
   WHERE deleted_at IS NULL;
 
 -- Tarifa actual por hogar (vigente_hasta NULL = tarifa vigente)
-CREATE INDEX IF NOT EXISTS idx_tariff_vigente_actual
-  ON homes.tariff (id_home, vigente_desde)
+CREATE INDEX IF NOT EXISTS idx_electricity_tariff_vigente_actual
+  ON homes.electricity_tariff (id_home, vigente_desde)
   WHERE vigente_hasta IS NULL AND deleted_at IS NULL;
 
 -- ============================================================

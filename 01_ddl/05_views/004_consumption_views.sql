@@ -32,7 +32,7 @@ SELECT DISTINCT ON (c.id_device)
   d.nombre        AS nombre_dispositivo,
   c.id_home,
   h.nombre        AS nombre_hogar,
-  d.id_area,
+  d.id_zone,
   a.nombre        AS nombre_zona,
   c.watts,
   c.kwh_acumulado,
@@ -43,7 +43,7 @@ JOIN devices.device          d ON d.id_device   = c.id_device
                                 AND d.deleted_at IS NULL
 JOIN homes.home               h ON h.id_home     = c.id_home
                                 AND h.deleted_at  IS NULL
-LEFT JOIN homes.area          a ON a.id_area      = d.id_area
+LEFT JOIN homes.zone          a ON a.id_zone      = d.id_zone
                                 AND a.deleted_at   IS NULL
 ORDER BY c.id_device, c.fecha_lectura DESC;
 

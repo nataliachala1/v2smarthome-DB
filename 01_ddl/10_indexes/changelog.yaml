@@ -1,1 +1,81 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 139bb977-0bb5-495f-b6af-e8c3bf35b2ae
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the auth domain.
+      changes:
+        - sqlFile:
+            path: 001_auth_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 9b96eee4-9a51-43fd-b449-b65fce51b723
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the homes domain.
+      changes:
+        - sqlFile:
+            path: 002_homes_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: f6177190-1532-42c9-ac23-e2d42eae7e24
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the devices domain.
+      changes:
+        - sqlFile:
+            path: 003_devices_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 0e126876-3436-4751-b335-bf47291a40d9
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the consumption domain.
+      changes:
+        - sqlFile:
+            path: 004_consumption_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 169f5d2b-086f-47d7-9ccd-6f4411cae783
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the notifications domain.
+      changes:
+        - sqlFile:
+            path: 005_notifications_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: dee84ff0-1fba-434e-ae9a-cdf837339286
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the sync domain.
+      changes:
+        - sqlFile:
+            path: 006_sync_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 22ad2b6b-8401-404c-8162-1da7579fc0cc
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the config domain.
+      changes:
+        - sqlFile:
+            path: 007_config_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 75dc2472-9ac5-423b-addf-8c350200be36
+      author: natalia chala
+      labels: "BD-01-dev,ddl,index"
+      comment: Creates indexes for the identity_audit domain.
+      changes:
+        - sqlFile:
+            path: 008_audit_indexes.sql
+            relativeToChangelogFile: true
+            stripComments: false

@@ -38,7 +38,7 @@ BEGIN
   -- Inicializar contadores
   p_total_procesadas   := 0;
   p_total_fallidas     := 0;
-  p_id_synchronization := uuid_generate_v4();
+  p_id_synchronization := gen_random_uuid();
 
   -- --------------------------------------------------------
   -- 1. Registrar inicio de sincronización
@@ -51,20 +51,6 @@ BEGIN
     p_id_synchronization, p_id_user, 'manual', 'exitosa',
     0, NOW()
   );
-
-  -- --------------------------------------------------------
-  -- 2. Iterar sobre acciones pendientes en orden FIFO
-  -- --------------------------------------------------------
-  FOR v_accion IN
-    SELECT id_offline_queue, tipo_accion, payload
-    FROM sync.offline_queue
-    WHERE id_user = p_id_user
-      AND estado  = 'pendiente'
-    ORDER BY created_at ASC
-  LOOP
-    BEGIN
-      v_tipo_accion := v_accion.tipo_accion;
-      v_payload     := v_accion.payload;
 
       -- ------------------------------------------------------
       -- 2a. Procesar según el tipo de acción
@@ -108,32 +94,6 @@ BEGIN
         RAISE EXCEPTION 'Tipo de acción no reconocido: %', v_tipo_accion;
       END IF;
 
-      -- ------------------------------------------------------
-      -- 2b. Marcar acción como procesada exitosamente
-      -- ------------------------------------------------------
-      UPDATE sync.offline_queue
-      SET
-        estado       = 'procesada',
-        procesada_at = NOW()
-      WHERE id_offline_queue = v_accion.id_offline_queue;
-
-      p_total_procesadas := p_total_procesadas + 1;
-
-    EXCEPTION
-      WHEN OTHERS THEN
-        -- --------------------------------------------------
-        -- 2c. Marcar acción como fallida sin detener el loop
-        -- --------------------------------------------------
-        UPDATE sync.offline_queue
-        SET
-          estado    = 'fallida',
-          intentos  = intentos + 1
-        WHERE id_offline_queue = v_accion.id_offline_queue;
-
-        p_total_fallidas := p_total_fallidas + 1;
-    END;
-  END LOOP;
-
   -- --------------------------------------------------------
   -- 3. Actualizar registro de sincronización con totales
   -- --------------------------------------------------------
@@ -151,24 +111,7 @@ BEGIN
                 ELSE NULL
               END
   WHERE id_synchronization = p_id_synchronization;
-
-  -- --------------------------------------------------------
-  -- 4. Registrar en auditoría
-  -- --------------------------------------------------------
-  INSERT INTO audit.audit_log (
-    id_audit_log, id_user, accion, modulo,
-    entidad, id_entidad, resultado, detalle, created_at
-  )
-  VALUES (
-    uuid_generate_v4(), p_id_user, 'editar', 'sync',
-    'offline_queue', p_id_synchronization,
-    CASE WHEN p_total_fallidas = 0 THEN 'exitoso' ELSE 'fallido' END,
-    CONCAT(
-      'Sincronización offline completada. Procesadas: ', p_total_procesadas,
-      ', Fallidas: ', p_total_fallidas
-    ),
-    NOW()
-  );
+ --------------------------------------------------------
 
 EXCEPTION
   WHEN OTHERS THEN

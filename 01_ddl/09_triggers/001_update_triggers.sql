@@ -34,10 +34,6 @@ CREATE TRIGGER trg_updated_at_session
   BEFORE UPDATE ON auth.session
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
-CREATE TRIGGER trg_updated_at_mfa
-  BEFORE UPDATE ON auth.mfa
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
 -- ============================================================
 -- Esquema: config
 -- ============================================================
@@ -54,12 +50,12 @@ CREATE TRIGGER trg_updated_at_home
   BEFORE UPDATE ON homes.home
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
-CREATE TRIGGER trg_updated_at_area
-  BEFORE UPDATE ON homes.area
+CREATE TRIGGER trg_updated_at_zone
+  BEFORE UPDATE ON homes.zone
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
 CREATE TRIGGER trg_updated_at_tariff
-  BEFORE UPDATE ON homes.tariff
+  BEFORE UPDATE ON homes.electricity_tariff
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
 -- ============================================================
@@ -67,7 +63,7 @@ CREATE TRIGGER trg_updated_at_tariff
 -- ============================================================
 
 CREATE TRIGGER trg_updated_at_type_device
-  BEFORE UPDATE ON devices.type_device
+  BEFORE UPDATE ON devices.device_type
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
 CREATE TRIGGER trg_updated_at_device
@@ -78,21 +74,10 @@ CREATE TRIGGER trg_updated_at_smart_device
   BEFORE UPDATE ON devices.smart_device
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
-CREATE TRIGGER trg_updated_at_manual_device
-  BEFORE UPDATE ON devices.manual_device
+CREATE TRIGGER trg_updated_at_device_schedule
+  BEFORE UPDATE ON devices.device_schedule
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
-CREATE TRIGGER trg_updated_at_schedule
-  BEFORE UPDATE ON devices.schedule
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
-CREATE TRIGGER trg_updated_at_threshold_rule
-  BEFORE UPDATE ON devices.threshold_rule
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
-CREATE TRIGGER trg_updated_at_voice_assistant_token
-  BEFORE UPDATE ON devices.voice_assistant_token
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
 -- ============================================================
 -- Esquema: consumption
@@ -112,16 +97,4 @@ CREATE TRIGGER trg_updated_at_recommendation
 
 CREATE TRIGGER trg_updated_at_notification
   BEFORE UPDATE ON notifications.notification
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
-CREATE TRIGGER trg_updated_at_reminder_notification
-  BEFORE UPDATE ON notifications.reminder_notification
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
--- ============================================================
--- Esquema: sync
--- ============================================================
-
-CREATE TRIGGER trg_updated_at_offline_queue
-  BEFORE UPDATE ON sync.offline_queue
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();

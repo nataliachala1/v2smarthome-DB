@@ -25,8 +25,8 @@ CREATE INDEX IF NOT EXISTS idx_device_id_home
   WHERE deleted_at IS NULL;
 
 -- Búsqueda de dispositivos por zona
-CREATE INDEX IF NOT EXISTS idx_device_id_area
-  ON devices.device (id_area)
+CREATE INDEX IF NOT EXISTS idx_device_id_zone
+  ON devices.device (id_zone)
   WHERE deleted_at IS NULL;
 
 -- Filtrado por estado del dispositivo
@@ -76,22 +76,22 @@ CREATE INDEX IF NOT EXISTS idx_manual_device_id_device
   ON devices.manual_device (id_device);
 
 -- ============================================================
--- TABLA: devices.schedule
+-- TABLA: devices.device_schedule
 -- ============================================================
 
 -- Búsqueda de horarios por dispositivo
 CREATE INDEX IF NOT EXISTS idx_schedule_id_device
-  ON devices.schedule (id_device)
+  ON devices.device_schedule (id_device)
   WHERE deleted_at IS NULL;
 
 -- Filtrado de horarios activos (job de ejecución automática)
 CREATE INDEX IF NOT EXISTS idx_schedule_activo
-  ON devices.schedule (activo)
+  ON devices.device_schedule (is_active)
   WHERE activo = TRUE AND deleted_at IS NULL;
 
 -- Compuesto: dispositivo + activo (horarios activos de un dispositivo)
 CREATE INDEX IF NOT EXISTS idx_schedule_id_device_activo
-  ON devices.schedule (id_device, activo)
+  ON devices.device_schedule (id_device, is_active)
   WHERE deleted_at IS NULL;
 
 -- ============================================================
