@@ -39,7 +39,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM homes.home
     WHERE id_home    = p_id_home
-      AND estado     = 'activo'
+      AND status     = 'ACTIVE'
       AND deleted_at IS NULL
   ) THEN
     RAISE EXCEPTION 'El hogar no existe o no está activo.';
@@ -64,12 +64,12 @@ BEGIN
   p_id_device := gen_random_uuid();
 
   INSERT INTO devices.device (
-    id_device, id_home, id_zone, id_type_device,
-    nombre, estado, encendido, created_at, updated_at
+    id_device, id_home, id_zone, id_device_type,
+    name, status, is_on, created_at, updated_at
   )
   VALUES (
-    p_id_device, p_id_home, p_id_zone, p_id_type_device,
-    p_nombre, 'desconectado', FALSE, NOW(), NOW()
+    p_id_device, p_id_home, p_id_zone, p_id_device_type,
+    p_nombre, 'OFFLINE', FALSE, NOW(), NOW()
   );
 
   -- --------------------------------------------------------
@@ -77,7 +77,7 @@ BEGIN
   -- --------------------------------------------------------
   IF p_es_inteligente THEN
     INSERT INTO devices.smart_device (
-      id_smart_device, id_device, modelo, fabricante, created_at, updated_at
+      id_smart_device, id_device, model, manufacturer, created_at, updated_at
     )
     VALUES (
       gen_random_uuid(), p_id_device, p_modelo, p_fabricante, NOW(), NOW()
@@ -95,12 +95,12 @@ BEGIN
   -- 5. Registrar estado inicial en el historial
   -- --------------------------------------------------------
   INSERT INTO devices.device_status_history (
-    id_device_status_history, id_device, estado_anterior,
-    estado_nuevo, encendido, origen, id_user, created_at
+    id_device_status_history, id_device, previous_status,
+    new_status, is_on, source, id_user, created_at
   )
   VALUES (
     gen_random_uuid(), p_id_device, NULL,
-    'desconectado', FALSE, 'sistema', p_id_user, NOW()
+    'OFFLINE', FALSE, 'SYSTEM', p_id_user, NOW()
   );
 
 EXCEPTION

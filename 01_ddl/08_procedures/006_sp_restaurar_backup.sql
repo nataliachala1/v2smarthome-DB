@@ -49,7 +49,7 @@ BEGIN
   -- --------------------------------------------------------
   -- 2. Validar que el backup a restaurar exista y sea válido
   -- --------------------------------------------------------
-  SELECT estado INTO v_estado_backup
+  SELECT status INTO v_estado_backup
   FROM sync.backup
   WHERE id_backup = p_id_backup_a_restaurar;
 
@@ -66,8 +66,8 @@ BEGIN
   p_id_backup_seguridad := gen_random_uuid();
 
   INSERT INTO sync.backup (
-    id_backup, id_user, tipo, alcance,
-    ubicacion, estado, descripcion, created_at
+    id_backup, id_user, type, scope,
+    location, status, description, created_at
   )
   VALUES (
     p_id_backup_seguridad, p_id_admin, 'automatico', 'completo',

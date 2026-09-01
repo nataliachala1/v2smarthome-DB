@@ -1,97 +1,418 @@
 -- ============================================================
--- POLÍTICAS RLS — Esquema homes
+-- RLS — Esquema homes
 -- Archivo: 03_dcl/02_policies/001_rls_homes.sql
--- Descripción: Habilita Row Level Security y define
---              políticas de acceso por fila para las
---              tablas del esquema homes. Garantiza que
---              cada usuario solo acceda a sus propios
---              hogares y zonas (RNF5.6, Ley 1581/2012).
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/002_create_homes_tables.sql
+--
+-- Modelo:
+--   homes.home
+--   homes.zone
+--   homes.electricity_tariff
+--   homes.home_member
+--
+-- Fuente de autorización contextual:
+--   homes.home_member
+--
+-- Roles:
+--   OWNER
+--   MEMBER
+--   GUEST
+--
+-- No existen policies DELETE.
 -- ============================================================
 
--- ============================================================
--- RLS: homes.home
--- ============================================================
-ALTER TABLE homes.home ENABLE ROW LEVEL SECURITY;
-ALTER TABLE homes.home FORCE ROW LEVEL SECURITY;
-
-CREATE POLICY home_select_policy ON homes.home
-  FOR SELECT TO smarthome_app
-  USING (
-    id_user    = current_setting('app.current_user_id')::UUID
-    AND deleted_at IS NULL
-  );
-
-CREATE POLICY home_insert_policy ON homes.home
-  FOR INSERT TO smarthome_app
-  WITH CHECK (
-    id_user = current_setting('app.current_user_id')::UUID
-  );
-
-CREATE POLICY home_update_policy ON homes.home
-  FOR UPDATE TO smarthome_app
-  USING (
-    id_user    = current_setting('app.current_user_id')::UUID
-    AND deleted_at IS NULL
-  );
-
-CREATE POLICY home_delete_policy ON homes.home
-  FOR DELETE TO smarthome_app
-  USING (
-    id_user = current_setting('app.current_user_id')::UUID
-  );
 
 -- ============================================================
--- RLS: homes.zone
+-- PERMISOS DE EJECUCIÓN DE HELPERS RLS
 -- ============================================================
-ALTER TABLE homes.zone ENABLE ROW LEVEL SECURITY;
-ALTER TABLE homes.zone FORCE ROW LEVEL SECURITY;
 
-CREATE POLICY zone_select_policy ON homes.zone
-  FOR SELECT TO smarthome_app
-  USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
+GRANT EXECUTE
+ON FUNCTION auth.fn_is_system_admin()
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_has_home_membership(UUID, TEXT[])
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_is_home_member(UUID, TEXT[])
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_is_home_owner(UUID)
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_can_manage_home(UUID)
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_can_create_initial_owner(UUID, UUID)
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_owner_membership_update_allowed(
+    UUID, UUID, UUID, TEXT, TEXT, TIMESTAMPTZ
+)
+TO smarthome_app;
+
+GRANT EXECUTE
+ON FUNCTION homes.fn_self_membership_transition_allowed(
+    UUID, UUID, UUID, TEXT, TEXT, TIMESTAMPTZ, TIMESTAMPTZ
+)
+TO smarthome_app;
+
+
+-- ============================================================
+-- homes.home
+-- ============================================================
+
+ALTER TABLE homes.home
+ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE homes.home
+FORCE ROW LEVEL SECURITY;
+
+
+-- ------------------------------------------------------------
+-- SELECT
+--
+-- ACTIVE:
+--   OWNER / MEMBER / GUEST pueden consultar.
+--
+-- PENDING:
+--   El usuario invitado puede consultar la información básica
+--   del hogar necesaria para decidir si acepta la invitación.
+--
+-- No filtramos deleted_at aquí porque el OWNER debe poder
+-- recuperar/reactivar un hogar DEACTIVATED.
+-- ------------------------------------------------------------
+
+CREATE POLICY home_select_policy
+ON homes.home
+FOR SELECT
+TO smarthome_app
+USING (
+    homes.fn_has_home_membership(
+        id_home,
+        ARRAY['PENDING', 'ACTIVE']::TEXT[]
     )
+);
+
+
+-- ------------------------------------------------------------
+-- INSERT
+--
+-- El usuario autenticado solo puede crear hogares cuyo
+-- created_by sea él mismo.
+-- ------------------------------------------------------------
+
+CREATE POLICY home_insert_policy
+ON homes.home
+FOR INSERT
+TO smarthome_app
+WITH CHECK (
+    created_by = auth.fn_current_user_id()
+    AND status = 'ACTIVE'
     AND deleted_at IS NULL
-  );
+);
 
-CREATE POLICY zone_insert_policy ON homes.zone
-  FOR INSERT TO smarthome_app
-  WITH CHECK (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
-  );
 
-CREATE POLICY zone_update_policy ON homes.zone
-  FOR UPDATE TO smarthome_app
-  USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
-    )
-    AND deleted_at IS NULL
-  );
+-- ------------------------------------------------------------
+-- UPDATE
+--
+-- Solo OWNER activo.
+--
+-- No exigimos home.status = ACTIVE en USING porque el OWNER
+-- debe poder reactivar un hogar DEACTIVATED.
+-- ------------------------------------------------------------
 
-CREATE POLICY zone_delete_policy ON homes.zone
-  FOR DELETE TO smarthome_app
-  USING (
-    id_home IN (
-      SELECT id_home FROM homes.home
-      WHERE id_user    = current_setting('app.current_user_id')::UUID
-        AND deleted_at IS NULL
+CREATE POLICY home_update_policy
+ON homes.home
+FOR UPDATE
+TO smarthome_app
+USING (
+    homes.fn_is_home_owner(id_home)
+)
+WITH CHECK (
+    homes.fn_is_home_owner(id_home)
+);
+
+
+-- ============================================================
+-- homes.zone
+-- ============================================================
+
+ALTER TABLE homes.zone
+ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE homes.zone
+FORCE ROW LEVEL SECURITY;
+
+
+-- ------------------------------------------------------------
+-- SELECT
+--
+-- OWNER / MEMBER / GUEST ACTIVE.
+-- ------------------------------------------------------------
+
+CREATE POLICY zone_select_policy
+ON homes.zone
+FOR SELECT
+TO smarthome_app
+USING (
+    deleted_at IS NULL
+    AND homes.fn_is_home_member(
+        id_home,
+        ARRAY['OWNER', 'MEMBER', 'GUEST']::TEXT[]
     )
-  );
+);
+
+
+-- ------------------------------------------------------------
+-- INSERT
+--
+-- Únicamente OWNER y hogar operativo.
+-- ------------------------------------------------------------
+
+CREATE POLICY zone_insert_policy
+ON homes.zone
+FOR INSERT
+TO smarthome_app
+WITH CHECK (
+    homes.fn_can_manage_home(id_home)
+);
+
+
+-- ------------------------------------------------------------
+-- UPDATE
+--
+-- Únicamente OWNER.
+-- Incluye soft delete de zona.
+-- ------------------------------------------------------------
+
+CREATE POLICY zone_update_policy
+ON homes.zone
+FOR UPDATE
+TO smarthome_app
+USING (
+    homes.fn_can_manage_home(id_home)
+)
+WITH CHECK (
+    homes.fn_can_manage_home(id_home)
+);
+
+
+-- ============================================================
+-- homes.electricity_tariff
+-- ============================================================
+
+ALTER TABLE homes.electricity_tariff
+ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE homes.electricity_tariff
+FORCE ROW LEVEL SECURITY;
+
+
+-- ------------------------------------------------------------
+-- SELECT
+--
+-- OWNER y MEMBER pueden consultar tarifas.
+--
+-- GUEST obtiene información básica de consumo y no necesita
+-- acceso directo a la configuración de tarifas.
+-- ------------------------------------------------------------
+
+CREATE POLICY electricity_tariff_select_policy
+ON homes.electricity_tariff
+FOR SELECT
+TO smarthome_app
+USING (
+    homes.fn_is_home_member(
+        id_home,
+        ARRAY['OWNER', 'MEMBER']::TEXT[]
+    )
+);
+
+
+-- ------------------------------------------------------------
+-- INSERT
+--
+-- Solo OWNER.
+-- created_by siempre debe coincidir con el usuario actual.
+-- ------------------------------------------------------------
+
+CREATE POLICY electricity_tariff_insert_policy
+ON homes.electricity_tariff
+FOR INSERT
+TO smarthome_app
+WITH CHECK (
+    homes.fn_can_manage_home(id_home)
+    AND created_by = auth.fn_current_user_id()
+);
+
+
+-- ------------------------------------------------------------
+-- UPDATE
+--
+-- Solo OWNER.
+-- ------------------------------------------------------------
+
+CREATE POLICY electricity_tariff_update_policy
+ON homes.electricity_tariff
+FOR UPDATE
+TO smarthome_app
+USING (
+    homes.fn_can_manage_home(id_home)
+)
+WITH CHECK (
+    homes.fn_can_manage_home(id_home)
+);
+
+
+-- ============================================================
+-- homes.home_member
+-- ============================================================
+
+ALTER TABLE homes.home_member
+ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE homes.home_member
+FORCE ROW LEVEL SECURITY;
+
+
+-- ------------------------------------------------------------
+-- SELECT
+--
+-- El OWNER puede consultar todas las membresías de su hogar.
+--
+-- Cada usuario puede consultar su propia membresía en cualquier
+-- estado, incluido PENDING para poder aceptar una invitación.
+--
+-- MEMBER/GUEST no obtienen automáticamente el listado completo
+-- de miembros del hogar.
+-- ------------------------------------------------------------
+
+CREATE POLICY home_member_select_policy
+ON homes.home_member
+FOR SELECT
+TO smarthome_app
+USING (
+    id_user = auth.fn_current_user_id()
+
+    OR
+
+    homes.fn_is_home_owner(id_home)
+);
+
+
+-- ------------------------------------------------------------
+-- INSERT
+--
+-- Caso A:
+--   crear la membresía OWNER inicial después de registrar
+--   un hogar.
+--
+-- Caso B:
+--   OWNER invita MEMBER/GUEST en estado PENDING.
+-- ------------------------------------------------------------
+
+CREATE POLICY home_member_insert_policy
+ON homes.home_member
+FOR INSERT
+TO smarthome_app
+WITH CHECK (
+
+    -- OWNER inicial
+    (
+        role = 'OWNER'
+        AND status = 'ACTIVE'
+        AND id_user = auth.fn_current_user_id()
+        AND invited_by IS NULL
+        AND accepted_at IS NOT NULL
+        AND ended_at IS NULL
+        AND homes.fn_can_create_initial_owner(
+            id_home,
+            id_user
+        )
+    )
+
+    OR
+
+    -- Invitación de MEMBER/GUEST
+    (
+        homes.fn_can_manage_home(id_home)
+
+        AND role IN ('MEMBER', 'GUEST')
+        AND status = 'PENDING'
+
+        AND invited_by = auth.fn_current_user_id()
+
+        AND accepted_at IS NULL
+        AND ended_at IS NULL
+
+        AND id_user <> auth.fn_current_user_id()
+    )
+);
+
+
+-- ------------------------------------------------------------
+-- UPDATE
+--
+-- Caso A:
+-- OWNER:
+--   - cambia MEMBER <-> GUEST;
+--   - revoca PENDING;
+--   - revoca ACTIVE.
+--
+-- Caso B:
+-- El propio MEMBER/GUEST:
+--   - acepta PENDING;
+--   - rechaza PENDING;
+--   - abandona ACTIVE.
+--
+-- La membresía OWNER no puede modificarse mediante esta
+-- operación genérica.
+-- ------------------------------------------------------------
+
+CREATE POLICY home_member_update_policy
+ON homes.home_member
+FOR UPDATE
+TO smarthome_app
+USING (
+
+    (
+        homes.fn_can_manage_home(id_home)
+        AND role IN ('MEMBER', 'GUEST')
+        AND status IN ('PENDING', 'ACTIVE')
+    )
+
+    OR
+
+    (
+        id_user = auth.fn_current_user_id()
+        AND role IN ('MEMBER', 'GUEST')
+        AND status IN ('PENDING', 'ACTIVE')
+    )
+)
+WITH CHECK (
+
+    homes.fn_owner_membership_update_allowed(
+        id_home_member,
+        id_home,
+        id_user,
+        role,
+        status,
+        ended_at
+    )
+
+    OR
+
+    homes.fn_self_membership_transition_allowed(
+        id_home_member,
+        id_home,
+        id_user,
+        role,
+        status,
+        accepted_at,
+        ended_at
+    )
+);

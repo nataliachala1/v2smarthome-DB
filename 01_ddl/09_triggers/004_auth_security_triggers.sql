@@ -40,13 +40,3 @@ COMMENT ON TRIGGER trg_auth_cambio_password ON auth.user
   IS 'Revoca todas las sesiones activas y registra tokens en blacklist al cambiar la contraseña.';
 
 -- ============================================================
--- TRIGGER: trg_auth_mfa_reset
--- Descripción: Resetea intentos fallidos de MFA al
---              completar verificación exitosamente
--- ============================================================
-CREATE TRIGGER trg_auth_mfa_reset
-  AFTER UPDATE ON auth.recovery_token
-  FOR EACH ROW EXECUTE FUNCTION fn_auth_mfa_reset();
-
-COMMENT ON TRIGGER trg_auth_mfa_reset ON auth.recovery_token
-  IS 'Resetea el contador de intentos fallidos de MFA tras verificación exitosa del segundo factor.';

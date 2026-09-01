@@ -4,6 +4,10 @@ ALTER TABLE devices.device
   ADD CONSTRAINT fk_device_type
   FOREIGN KEY (id_device_type) REFERENCES devices.device_type (id_device_type);
 
+ALTER TABLE devices.device
+ADD CONSTRAINT uq_device_id_home
+UNIQUE (id_device, id_home);
+
 ALTER TABLE devices.smart_device
   ADD CONSTRAINT fk_smart_device_device
   FOREIGN KEY (id_device) REFERENCES devices.device (id_device);

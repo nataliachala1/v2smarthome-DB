@@ -1,35 +1,124 @@
 -- ============================================================
--- GRANTS — Esquema devices
+-- GRANTS - Esquema devices
 -- Archivo: 03_dcl/01_grants/003_grants_devices.sql
--- Descripción: Otorga privilegios sobre los objetos del
---              esquema devices a los roles de PostgreSQL.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/003_create_devices_tables.sql
 -- ============================================================
 
-GRANT USAGE ON SCHEMA devices TO smarthome_admin, smarthome_app, smarthome_readonly;
+GRANT USAGE ON SCHEMA devices
+TO
+  smarthome_admin,
+  smarthome_app,
+  smarthome_readonly,
+  smarthome_ingest;
 
--- smarthome_admin: acceso total
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA devices TO smarthome_admin;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA devices TO smarthome_admin;
+-- ============================================================
+-- devices.device_type
+-- ============================================================
 
--- smarthome_app: lectura y escritura
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA devices TO smarthome_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA devices TO smarthome_app;
+GRANT SELECT
+ON TABLE devices.device_type
+TO
+  smarthome_admin,
+  smarthome_app,
+  smarthome_readonly;
 
--- smarthome_readonly: solo lectura
-GRANT SELECT ON ALL TABLES IN SCHEMA devices TO smarthome_readonly;
+-- ============================================================
+-- devices.device
+-- ============================================================
 
--- Aplicar a tablas futuras
-ALTER DEFAULT PRIVILEGES IN SCHEMA devices
-  GRANT SELECT, INSERT, UPDATE ON TABLES TO smarthome_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA devices
-  GRANT SELECT ON TABLES TO smarthome_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA devices
-  GRANT ALL PRIVILEGES ON TABLES TO smarthome_admin;
+GRANT SELECT, INSERT
+ON TABLE devices.device
+TO smarthome_app;
+
+GRANT UPDATE (
+  id_zone,
+  id_device_type,
+  name,
+  status,
+  is_on,
+  transport_type,
+  messaging_protocol,
+  updated_at,
+  deleted_at
+)
+ON TABLE devices.device
+TO smarthome_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE devices.device
+TO smarthome_admin;
+
+GRANT SELECT
+ON TABLE devices.device
+TO smarthome_ingest;
+
+GRANT UPDATE (
+  connectivity_status,
+  is_on,
+  current_power_w,
+  updated_at
+)
+ON TABLE devices.device
+TO smarthome_ingest;
+
+-- ============================================================
+-- devices.smart_device
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE devices.smart_device
+TO smarthome_app;
+
+GRANT UPDATE (
+  manufacturer,
+  model,
+  firmware_version,
+  max_capacity_w,
+  supports_matter,
+  updated_at
+)
+ON TABLE devices.smart_device
+TO smarthome_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE devices.smart_device
+TO smarthome_admin;
+
+GRANT SELECT
+ON TABLE devices.smart_device
+TO smarthome_ingest;
+
+-- ============================================================
+-- devices.device_schedule
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE devices.device_schedule
+TO smarthome_app;
+
+GRANT UPDATE (
+  action,
+  time_of_day,
+  days_of_week,
+  is_active,
+  updated_at,
+  deleted_at
+)
+ON TABLE devices.device_schedule
+TO smarthome_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE devices.device_schedule
+TO smarthome_admin;
+
+-- ============================================================
+-- devices.device_telemetry_raw
+-- Telemetria cruda append-only para ingesta.
+-- ============================================================
+
+GRANT INSERT
+ON TABLE devices.device_telemetry_raw
+TO smarthome_ingest;
+
+GRANT SELECT
+ON TABLE devices.device_telemetry_raw
+TO smarthome_admin;

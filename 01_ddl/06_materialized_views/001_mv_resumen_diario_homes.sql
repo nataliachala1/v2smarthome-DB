@@ -29,11 +29,11 @@ SELECT
   h.nombre                          AS nombre_hogar,
   DATE(c.read_at)                   AS fecha,
   SUM(c.energy_delta_kwh)           AS kwh_total_dia,
-  SUM(c.costo_estimado) FILTER (WHERE c.costo_estimado IS NOT NULL) AS costo_total_dia,
-  COUNT(*) FILTER (WHERE c.costo_estimado IS NULL) AS lecturas_sin_costo,
-  AVG(c.power_w)                    AS watts_promedio,
-  MAX(c.power_w)                    AS watts_maximo,
-  MIN(c.power_w)                    AS watts_minimo,
+  SUM(c.estimated_cost) FILTER (WHERE c.estimated_cost IS NOT NULL) AS costo_total_dia,
+  COUNT(*) FILTER (WHERE c.estimated_cost IS NULL) AS lecturas_sin_costo,
+  AVG(c.power_w)                    AS average_watts,
+  MAX(c.power_w)                    AS max_watts,
+  MIN(c.power_w)                    AS min_watts,
   COUNT(DISTINCT c.id_device)       AS dispositivos_con_lectura
 FROM consumption.consumption c
 JOIN homes.home               h ON h.id_home = c.id_home

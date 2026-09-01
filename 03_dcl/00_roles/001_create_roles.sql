@@ -1,115 +1,172 @@
 -- ============================================================
--- ROLES — Roles de PostgreSQL
--- Archivo: 03_dcl/00_roles/001_create_roles.sql
--- Descripción: Crea los tres roles de PostgreSQL del sistema
---              Smart Home. Estos roles son independientes de
---              los roles del sistema (auth.role) y controlan
---              qué puede hacer el motor de base de datos
---              con cada conexión.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: ninguna
+-- ROLES PostgreSQL - Smart Home
+-- ============================================================
+-- Estos roles son tecnicos y son independientes de:
+--
+--   auth.role:
+--     SYSTEM_ADMIN
+--     USER
+--
+-- y de homes.home_member.role:
+--     OWNER
+--     MEMBER
+--     GUEST
+--
+-- Ninguno de estos roles contiene credenciales.
+-- Los usuarios LOGIN se provisionan fuera de las migraciones.
 -- ============================================================
 
--- ============================================================
--- ROL: smarthome_admin
--- Acceso total a la base de datos
--- ============================================================
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_admin') THEN
-    CREATE ROLE smarthome_admin
-      NOLOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      INHERIT
-      NOREPLICATION;
-    COMMENT ON ROLE smarthome_admin IS
-      'Rol administrativo con acceso total a los esquemas y tablas del sistema Smart Home.';
-  END IF;
-END $$;
 
 -- ============================================================
--- ROL: smarthome_app
--- Rol del backend / API
+-- smarthome_admin
+-- Administracion tecnica de base de datos.
+-- Puede atravesar RLS para tareas administrativas.
+-- Nunca debe utilizarse como conexion normal de NestJS.
 -- ============================================================
+
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_app') THEN
-    CREATE ROLE smarthome_app
-      NOLOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      INHERIT
-      NOREPLICATION;
-    COMMENT ON ROLE smarthome_app IS
-      'Rol utilizado por el servidor de aplicaciones (API). Tiene permisos de lectura y escritura sobre las tablas del sistema Smart Home.';
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_roles
+    WHERE rolname = 'smarthome_admin'
+  ) THEN
+    CREATE ROLE smarthome_admin;
   END IF;
-END $$;
+END
+$$;
+
+ALTER ROLE smarthome_admin
+  NOLOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  INHERIT
+  NOREPLICATION
+  BYPASSRLS;
+
+COMMENT ON ROLE smarthome_admin IS
+  'Rol tecnico administrativo de Smart Home. NO debe utilizarse como conexion normal del backend.';
+
 
 -- ============================================================
--- ROL: smarthome_readonly
--- Solo lectura para reportes y auditorías externas
+-- smarthome_app
+-- Rol principal utilizado por NestJS.
+-- RLS siempre debe aplicarse.
 -- ============================================================
+
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_readonly') THEN
-    CREATE ROLE smarthome_readonly
-      NOLOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      INHERIT
-      NOREPLICATION;
-    COMMENT ON ROLE smarthome_readonly IS
-      'Rol de solo lectura para herramientas de reportes, BI o auditorías externas del sistema Smart Home.';
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_roles
+    WHERE rolname = 'smarthome_app'
+  ) THEN
+    CREATE ROLE smarthome_app;
   END IF;
-END $$;
+END
+$$;
+
+ALTER ROLE smarthome_app
+  NOLOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  INHERIT
+  NOREPLICATION
+  NOBYPASSRLS;
+
+COMMENT ON ROLE smarthome_app IS
+  'Rol tecnico utilizado por NestJS. Acceso limitado por GRANT y Row Level Security.';
+
 
 -- ============================================================
--- ROL: smarthome_ingest
--- Actor técnico: pipeline de ingesta de telemetría (MQTT).
--- Solo inserta lecturas crudas de consumo.
+-- smarthome_readonly
+-- Consultas tecnicas/reportes autorizados.
+-- No atraviesa RLS.
 -- ============================================================
+
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_ingest') THEN
-    CREATE ROLE smarthome_ingest
-      NOLOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      INHERIT
-      NOREPLICATION
-      NOBYPASSRLS;
-    COMMENT ON ROLE smarthome_ingest IS
-      'Rol técnico del pipeline de ingesta MQTT. Solo inserta lecturas de consumo; sin acceso a datos de usuarios ni hogares.';
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_roles
+    WHERE rolname = 'smarthome_readonly'
+  ) THEN
+    CREATE ROLE smarthome_readonly;
   END IF;
-END $$;
+END
+$$;
+
+ALTER ROLE smarthome_readonly
+  NOLOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  INHERIT
+  NOREPLICATION
+  NOBYPASSRLS;
+
+COMMENT ON ROLE smarthome_readonly IS
+  'Rol tecnico de solo lectura. Sus objetos permitidos se conceden explicitamente.';
+
 
 -- ============================================================
--- ROL: smarthome_worker
--- Actor técnico: jobs programados (agregación de métricas,
--- generación de recomendaciones, mantenimiento de particiones).
+-- smarthome_ingest
+-- Ingesta MQTT / telemetria.
 -- ============================================================
+
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'smarthome_worker') THEN
-    CREATE ROLE smarthome_worker
-      NOLOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      INHERIT
-      NOREPLICATION
-      NOBYPASSRLS;
-    COMMENT ON ROLE smarthome_worker IS
-      'Rol técnico de jobs programados: agrega métricas de consumo, genera recomendaciones y mantiene particiones.';
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_roles
+    WHERE rolname = 'smarthome_ingest'
+  ) THEN
+    CREATE ROLE smarthome_ingest;
   END IF;
-END $$;
+END
+$$;
+
+ALTER ROLE smarthome_ingest
+  NOLOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  INHERIT
+  NOREPLICATION
+  NOBYPASSRLS;
+
+COMMENT ON ROLE smarthome_ingest IS
+  'Rol tecnico para ingesta MQTT y persistencia de telemetria.';
+
+
+-- ============================================================
+-- smarthome_worker
+-- Jobs controlados: agregaciones, recomendaciones,
+-- mantenimiento de particiones, etc.
+-- ============================================================
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_roles
+    WHERE rolname = 'smarthome_worker'
+  ) THEN
+    CREATE ROLE smarthome_worker;
+  END IF;
+END
+$$;
+
+ALTER ROLE smarthome_worker
+  NOLOGIN
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  INHERIT
+  NOREPLICATION
+  NOBYPASSRLS;
+
+COMMENT ON ROLE smarthome_worker IS
+  'Rol tecnico para procesos programados y tareas internas controladas.';

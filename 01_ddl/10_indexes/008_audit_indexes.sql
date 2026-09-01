@@ -22,15 +22,15 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_id_user
 
 -- Filtrado por tipo de acción (login, crear, editar, eliminar, etc.)
 CREATE INDEX IF NOT EXISTS idx_audit_log_accion
-  ON identity_audit.audit_log (accion);
+  ON identity_audit.audit_log (action);
 
 -- Filtrado por módulo del sistema
 CREATE INDEX IF NOT EXISTS idx_audit_log_modulo
-  ON identity_audit.audit_log (modulo);
+  ON identity_audit.audit_log (module);
 
 -- Filtrado por entidad afectada
 CREATE INDEX IF NOT EXISTS idx_audit_log_entidad
-  ON identity_audit.audit_log (entidad);
+  ON identity_audit.audit_log (entity);
 
 -- Filtrado y ordenamiento por fecha (columna más usada en consultas)
 CREATE INDEX IF NOT EXISTS idx_audit_log_created_at
@@ -38,11 +38,11 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_created_at
 
 -- Filtrado por resultado de la acción (exitoso / fallido)
 CREATE INDEX IF NOT EXISTS idx_audit_log_resultado
-  ON identity_audit.audit_log (resultado);
+  ON identity_audit.audit_log (result);
 
 -- Compuesto: módulo + fecha (actividad de un módulo en un periodo)
 CREATE INDEX IF NOT EXISTS idx_audit_log_modulo_created_at
-  ON identity_audit.audit_log (modulo, created_at DESC);
+  ON identity_audit.audit_log (module, created_at DESC);
 
 -- Compuesto: usuario + fecha (actividad reciente de un usuario)
 CREATE INDEX IF NOT EXISTS idx_audit_log_user_created_at
@@ -50,17 +50,17 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_user_created_at
 
 -- Compuesto: acción + fecha (todas las acciones de un tipo en un periodo)
 CREATE INDEX IF NOT EXISTS idx_audit_log_accion_created_at
-  ON identity_audit.audit_log (accion, created_at DESC);
+  ON identity_audit.audit_log (action, created_at DESC);
 
 -- Compuesto: módulo + acción (operaciones específicas por módulo)
 CREATE INDEX IF NOT EXISTS idx_audit_log_modulo_accion
-  ON identity_audit.audit_log (modulo, accion);
+  ON identity_audit.audit_log (module, action);
 
 -- Compuesto: resultado + fecha (errores recientes del sistema)
 CREATE INDEX IF NOT EXISTS idx_audit_log_resultado_created_at
-  ON identity_audit.audit_log (resultado, created_at DESC)
-  WHERE resultado = 'fallido';
+  ON identity_audit.audit_log (result, created_at DESC)
+  WHERE result = 'failure';
 
 -- Compuesto: usuario + módulo + fecha (auditoría detallada por usuario y módulo)
 CREATE INDEX IF NOT EXISTS idx_audit_log_user_modulo_fecha
-  ON identity_audit.audit_log (id_user, modulo, created_at DESC);
+  ON identity_audit.audit_log (id_user, module, created_at DESC);

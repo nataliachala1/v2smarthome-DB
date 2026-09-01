@@ -22,7 +22,7 @@ BEGIN;
   -- 1. Insertar nuevo usuario
   INSERT INTO auth.user (
     id_user, nombre, apellido, username, email, password_hash,
-    tipo_documento, numero_documento, estado, email_verificado,
+    tipo_documento, numero_documento, status, email_verificado,
     created_at, updated_at
   )
   VALUES (
@@ -47,8 +47,8 @@ BEGIN;
 
   -- 3. Crear configuración por defecto
   INSERT INTO config.configuration_user (
-    id_configuration_user, id_user, idioma, tema,
-    formato_fecha, formato_hora, moneda, created_at, updated_at
+    id_configuration_user, id_user, language, theme,
+    date_format, time_format, currency, created_at, updated_at
   )
   VALUES (
     gen_random_uuid(), :id_user,
@@ -60,7 +60,7 @@ BEGIN;
 
   -- 4. Crear token de confirmación de correo
   INSERT INTO auth.recovery_token (
-    id_recovery_token, id_user, token, tipo, expira_en, created_at
+    id_recovery_token, id_user, token, type, expira_en, created_at
   )
   VALUES (
     gen_random_uuid(), :id_user,

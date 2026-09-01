@@ -24,12 +24,11 @@ CREATE OR REPLACE VIEW homes.vw_hogares_activos AS
 SELECT
   h.id_home,
   h.id_user,
-  u.nombre              AS propietario_nombre,
-  u.apellido            AS propietario_apellido,
+  u.name              AS propietario_nombre,          AS propietario_apellido,
   u.email               AS propietario_email,
-  h.nombre              AS nombre_hogar,
+  h.name_home              AS nombre_hogar,
   h.estrato,
-  h.estado,
+  h.status,
   h.created_at,
   h.updated_at,
   COUNT(DISTINCT a.id_zone)     AS total_zonas,
@@ -42,16 +41,15 @@ LEFT JOIN homes.zone    a  ON a.id_home    = h.id_home
 LEFT JOIN devices.device d ON d.id_home    = h.id_home
                            AND d.deleted_at IS NULL
 WHERE h.deleted_at IS NULL
-  AND h.estado     = 'activo'
+  AND h.status     = 'activo'
 GROUP BY
   h.id_home,
   h.id_user,
-  u.nombre,
-  u.apellido,
-  u.email,
-  h.nombre,
+  u.name              AS propietario_nombre,
+  u.email               AS propietario_email,
+  h.name_home              AS nombre_hogar,
   h.estrato,
-  h.estado,
+  h.status,
   h.created_at,
   h.updated_at;
 
@@ -69,9 +67,9 @@ CREATE OR REPLACE VIEW homes.vw_zonas_con_dispositivos AS
 SELECT
   a.id_zone,
   a.id_home,
-  h.nombre                        AS nombre_hogar,
-  a.nombre                        AS nombre_zona,
-  a.tipo,
+  h.name_home              AS nombre_hogar,
+  a.name_zone              AS nombre_zona,
+  a.type,
   COUNT(d.id_device)              AS total_dispositivos,
   COUNT(
     CASE WHEN d.encendido = TRUE
@@ -85,14 +83,14 @@ JOIN homes.home          h  ON h.id_home    = a.id_home
                             AND h.deleted_at IS NULL
 LEFT JOIN devices.device d  ON d.id_zone    = a.id_zone
                             AND d.deleted_at IS NULL
-                            AND d.estado     = 'conectado'
+                            AND d.status     = 'conectado'
 WHERE a.deleted_at IS NULL
 GROUP BY
   a.id_zone,
   a.id_home,
-  h.nombre,
-  a.nombre,
-  a.tipo;
+  h.name_home              AS nombre_hogar,
+  a.name_zone              AS nombre_zona,
+  a.type;
 
 COMMENT ON VIEW homes.vw_zonas_con_dispositivos
   IS 'Zonas activas con conteo de dispositivos vinculados y consumo actual total de la zona en Watts.';
@@ -108,10 +106,10 @@ CREATE OR REPLACE VIEW homes.vw_tarifas_vigentes AS
 SELECT
   t.id_electricity_tariff,
   t.id_home,
-  h.nombre          AS nombre_hogar,
+  h.name_home              AS nombre_hogar,
   h.id_user,
   t.costo_kwh,
-  t.moneda,
+  t.currency,
   t.vigente_desde
 FROM homes.electricity_tariff   t
 JOIN homes.home     h  ON h.id_home    = t.id_home
@@ -137,7 +135,7 @@ CREATE OR REPLACE VIEW homes.vw_miembros_hogar AS
 SELECT
   hm.id_home_member,
   hm.id_home,
-  h.name          AS nombre_hogar,
+  h.name_home              AS nombre_hogar,
   h.id_user         AS id_propietario,
   hm.id_user,
   u.email           AS miembro_email,
@@ -164,19 +162,19 @@ COMMENT ON VIEW homes.vw_miembros_hogar
 CREATE OR REPLACE VIEW homes.vw_resumen_hogar AS
 SELECT
   h.id_home,
-  h.nombre                          AS nombre_hogar,
+  h.name_home              AS nombre_hogar,
   h.estrato,
-  h.estado,
+  h.status,
   u.id_user                         AS id_propietario,
-  u.nombre                          AS propietario_nombre,
+  u.name                            AS propietario_nombre,
   u.email                           AS propietario_email,
   t.costo_kwh                       AS tarifa_vigente,
-  t.moneda,
+  t.currency,
   COUNT(DISTINCT a.id_zone)         AS total_zonas,
   COUNT(DISTINCT d.id_device)       AS total_dispositivos,
   COUNT(
     DISTINCT CASE
-      WHEN d.estado = 'conectado'
+      WHEN d.status = 'conectado'
       THEN d.id_device
     END
   )                                 AS dispositivos_conectados,
@@ -204,17 +202,17 @@ LEFT JOIN homes.zone      a  ON a.id_home       = h.id_home
 LEFT JOIN devices.device  d  ON d.id_home       = h.id_home
                              AND d.deleted_at    IS NULL
 WHERE h.deleted_at IS NULL
-  AND h.estado     = 'activo'
+  AND h.status     = 'activo'
 GROUP BY
   h.id_home,
   h.name,
   h.estrato,
-  h.estado,
+  h.status,
   u.id_user,
   u.name,
   u.email,
   t.costo_kwh,
-  t.moneda;
+  t.currency;
 
 COMMENT ON VIEW homes.vw_resumen_hogar
   IS 'Resumen completo por hogar con tarifa vigente, conteo de zonas, dispositivos y consumo actual total en Watts.';

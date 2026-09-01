@@ -18,22 +18,22 @@
 CREATE TABLE IF NOT EXISTS sync.synchronization (
   id_synchronization           UUID        NOT NULL DEFAULT gen_random_uuid(),
   id_user                      UUID        NOT NULL,
-  tipo                         VARCHAR(20) NOT NULL,
-  estado                       VARCHAR(20) NOT NULL,
-  dispositivos_sincronizados   SMALLINT    NULL,
-  errores                      TEXT        NULL,
+  type                         VARCHAR(20) NOT NULL,
+  status                       VARCHAR(20) NOT NULL,
+  synchronized_devices   SMALLINT    NULL,
+  errors                      TEXT        NULL,
   created_at                   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
   CONSTRAINT pk_synchronization         PRIMARY KEY (id_synchronization),
-  CONSTRAINT ck_synchronization_tipo    CHECK (tipo   IN ('automatica', 'manual')),
-  CONSTRAINT ck_synchronization_estado  CHECK (estado IN ('exitosa', 'fallida', 'parcial')),
+  CONSTRAINT ck_synchronization_tipo    CHECK (type   IN ('automatica', 'manual')),
+  CONSTRAINT ck_synchronization_estado  CHECK (status IN ('exitosa', 'fallida', 'parcial')),
   CONSTRAINT ck_synchronization_dispos  CHECK (
-    dispositivos_sincronizados IS NULL OR
-    dispositivos_sincronizados >= 0
+    synchronized_devices IS NULL OR
+    synchronized_devices >= 0
   ),
   CONSTRAINT ck_synchronization_errores CHECK (
-    (estado = 'exitosa' AND errores IS NULL) OR
-    (estado IN ('fallida', 'parcial'))
+    (status = 'exitosa' AND errors IS NULL) OR
+    (status IN ('fallida', 'parcial'))
   )
 );
 
@@ -48,17 +48,17 @@ CREATE TABLE IF NOT EXISTS sync.synchronization (
 CREATE TABLE IF NOT EXISTS sync.backup (
   id_backup      UUID        NOT NULL DEFAULT gen_random_uuid(),
   id_user        UUID        NULL,
-  tipo           VARCHAR(20) NOT NULL,
-  alcance        VARCHAR(20) NOT NULL DEFAULT 'completo',
-  ubicacion      TEXT        NOT NULL,
-  tamanio_bytes  BIGINT      NULL,
-  estado         VARCHAR(20) NOT NULL DEFAULT 'completado',
-  descripcion    TEXT        NULL,
+  type           VARCHAR(20) NOT NULL,
+  scope        VARCHAR(20) NOT NULL DEFAULT 'completo',
+  location      TEXT        NOT NULL,
+  size_bytes  BIGINT      NULL,
+  status         VARCHAR(20) NOT NULL DEFAULT 'completado',
+  description    TEXT        NULL,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
   CONSTRAINT pk_backup           PRIMARY KEY (id_backup),
-  CONSTRAINT ck_backup_tipo      CHECK (tipo    IN ('automatico', 'manual')),
-  CONSTRAINT ck_backup_alcance   CHECK (alcance IN ('completo', 'parcial')),
-  CONSTRAINT ck_backup_estado    CHECK (estado  IN ('en_proceso', 'completado', 'fallido')),
-  CONSTRAINT ck_backup_tamanio   CHECK (tamanio_bytes IS NULL OR tamanio_bytes > 0)
+  CONSTRAINT ck_backup_tipo      CHECK (type    IN ('automatico', 'manual')),
+  CONSTRAINT ck_backup_alcance   CHECK (scope IN ('completo', 'parcial')),
+  CONSTRAINT ck_backup_estado    CHECK (status  IN ('en_proceso', 'completado', 'fallido')),
+  CONSTRAINT ck_backup_tamanio   CHECK (size_bytes IS NULL OR size_bytes > 0)
 );

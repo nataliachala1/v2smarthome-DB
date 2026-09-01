@@ -11,22 +11,22 @@
 
 -- Búsqueda de hogares por usuario propietario
 CREATE INDEX IF NOT EXISTS idx_home_id_user
-  ON homes.home (id_user)
+  ON homes.home (created_by)
   WHERE deleted_at IS NULL;
 
 -- Filtrado por estado del hogar (activo, desactivado)
 CREATE INDEX IF NOT EXISTS idx_home_estado
-  ON homes.home (estado)
+  ON homes.home (status)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: usuario + estado (hogares activos de un usuario)
 CREATE INDEX IF NOT EXISTS idx_home_id_user_estado
-  ON homes.home (id_user, estado)
+  ON homes.home (created_by, status)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: usuario + nombre (validación de nombre único por usuario)
 CREATE INDEX IF NOT EXISTS idx_home_id_user_nombre
-  ON homes.home (id_user, nombre)
+  ON homes.home (created_by, name)
   WHERE deleted_at IS NULL;
 
 -- ============================================================
@@ -40,12 +40,12 @@ CREATE INDEX IF NOT EXISTS idx_zone_id_home
 
 -- Filtrado por tipo de zona (sala, cocina, dormitorio, etc.)
 CREATE INDEX IF NOT EXISTS idx_zone_tipo
-  ON homes.zone (tipo)
+  ON homes.zone (type)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: hogar + nombre (validación de nombre único por hogar)
 CREATE INDEX IF NOT EXISTS idx_zone_id_home_nombre
-  ON homes.zone (id_home, nombre)
+  ON homes.zone (id_home, name)
   WHERE deleted_at IS NULL;
 
 -- ============================================================
@@ -85,3 +85,25 @@ CREATE INDEX IF NOT EXISTS idx_home_member_id_user
 CREATE INDEX IF NOT EXISTS idx_home_member_id_home_rol
   ON homes.home_member (id_home, rol_en_hogar)
   WHERE deleted_at IS NULL;
+
+  -- Un usuario no puede tener dos membresías vigentes
+-- simultáneamente en el mismo hogar.
+
+CREATE UNIQUE INDEX IF NOT EXISTS
+uq_home_member_current_membership
+ON homes.home_member (
+    id_home,
+    id_user
+)
+WHERE status IN ('PENDING', 'ACTIVE');
+
+
+-- Solo puede existir un OWNER ACTIVE por hogar.
+
+CREATE UNIQUE INDEX IF NOT EXISTS
+uq_home_member_active_owner
+ON homes.home_member (
+    id_home
+)
+WHERE role = 'OWNER'
+  AND status = 'ACTIVE';

@@ -22,16 +22,8 @@ CREATE TRIGGER trg_updated_at_role
   BEFORE UPDATE ON auth.role
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
-CREATE TRIGGER trg_updated_at_permission
-  BEFORE UPDATE ON auth.permission
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
 CREATE TRIGGER trg_updated_at_user
   BEFORE UPDATE ON auth.user
-  FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
-
-CREATE TRIGGER trg_updated_at_session
-  BEFORE UPDATE ON auth.session
   FOR EACH ROW EXECUTE FUNCTION fn_updated_at();
 
 -- ============================================================

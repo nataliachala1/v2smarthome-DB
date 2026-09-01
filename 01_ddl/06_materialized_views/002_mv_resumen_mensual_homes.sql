@@ -30,10 +30,10 @@ SELECT
   h.nombre                          AS nombre_hogar,
   DATE_TRUNC('month', c.read_at)::DATE AS mes,
   SUM(c.energy_delta_kwh)           AS kwh_total_mes,
-  SUM(c.costo_estimado) FILTER (WHERE c.costo_estimado IS NOT NULL) AS costo_total_mes,
-  COUNT(*) FILTER (WHERE c.costo_estimado IS NULL)  AS lecturas_sin_costo,
-  AVG(c.power_w)                    AS watts_promedio,
-  MAX(c.power_w)                    AS watts_maximo,
+  SUM(c.estimated_cost) FILTER (WHERE c.estimated_cost IS NOT NULL) AS costo_total_mes,
+  COUNT(*) FILTER (WHERE c.estimated_cost IS NULL)  AS lecturas_sin_costo,
+  AVG(c.power_w)                    AS average_watts,
+  MAX(c.power_w)                    AS max_watts,
   COUNT(DISTINCT DATE(c.read_at))   AS dias_con_datos
 FROM consumption.consumption c
 JOIN homes.home               h ON h.id_home = c.id_home

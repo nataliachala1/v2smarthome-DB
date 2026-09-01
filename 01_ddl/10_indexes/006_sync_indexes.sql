@@ -20,11 +20,11 @@ CREATE INDEX IF NOT EXISTS idx_synchronization_created_at
 
 -- Filtrado por tipo (automatica, manual)
 CREATE INDEX IF NOT EXISTS idx_synchronization_tipo
-  ON sync.synchronization (tipo);
+  ON sync.synchronization (type);
 
 -- Filtrado por estado (exitosa, fallida, parcial)
 CREATE INDEX IF NOT EXISTS idx_synchronization_estado
-  ON sync.synchronization (estado);
+  ON sync.synchronization (status);
 
 -- Compuesto: usuario + fecha (sincronizaciones recientes de un usuario)
 CREATE INDEX IF NOT EXISTS idx_synchronization_user_created_at
@@ -40,7 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_backup_id_user
 
 -- Filtrado por tipo de backup (automatico, manual)
 CREATE INDEX IF NOT EXISTS idx_backup_tipo
-  ON sync.backup (tipo);
+  ON sync.backup (type);
 
 -- Filtrado por fecha de creación (listado de backups disponibles)
 CREATE INDEX IF NOT EXISTS idx_backup_created_at
@@ -48,13 +48,13 @@ CREATE INDEX IF NOT EXISTS idx_backup_created_at
 
 -- Filtrado por estado del backup (en_proceso, completado, fallido)
 CREATE INDEX IF NOT EXISTS idx_backup_estado
-  ON sync.backup (estado);
+  ON sync.backup (status);
 
 -- Compuesto: usuario + estado + fecha (backups completados de un usuario)
 CREATE INDEX IF NOT EXISTS idx_backup_user_estado_fecha
-  ON sync.backup (id_user, estado, created_at DESC);
+  ON sync.backup (id_user, status, created_at DESC);
 
 -- Backups automáticos completados (listado para restauración)
 CREATE INDEX IF NOT EXISTS idx_backup_automatico_completado
   ON sync.backup (created_at DESC)
-  WHERE tipo = 'automatico' AND estado = 'completado';
+  WHERE type = 'automatico' AND status = 'completado';

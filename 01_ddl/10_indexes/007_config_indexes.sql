@@ -16,13 +16,13 @@ CREATE INDEX IF NOT EXISTS idx_configuration_user_id_user
 
 -- Filtrado por idioma (estadísticas de uso por idioma)
 CREATE INDEX IF NOT EXISTS idx_configuration_user_idioma
-  ON config.configuration_user (idioma);
+  ON config.configuration_user (language);
 
 -- Filtrado por tema visual (estadísticas claro/oscuro/automatico)
 CREATE INDEX IF NOT EXISTS idx_configuration_user_tema
-  ON config.configuration_user (tema);
+  ON config.configuration_user (theme);
 
 -- Usuarios con recomendaciones activas (job de generación de recomendaciones)
 CREATE INDEX IF NOT EXISTS idx_configuration_user_recomendaciones
-  ON config.configuration_user (recomendaciones_activas, frecuencia_recomendaciones)
-  WHERE recomendaciones_activas = TRUE;
+  ON config.configuration_user (recommendations_enabled, recommendation_frequency)
+  WHERE recommendations_enabled = TRUE;

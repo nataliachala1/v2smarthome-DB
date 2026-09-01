@@ -21,17 +21,7 @@ databaseChangeLog:
             relativeToChangelogFile: true
             stripComments: false
             splitStatements: false
-  - changeSet:
-      id: 71bac97d-d9ea-442b-a724-20511fbd316c
-      author: natalia chala
-      labels: "BD-01-dev,ddl,trigger"
-      comment: Creates triggers for user configuration.
-      changes:
-        - sqlFile:
-            path: 003_config_user_triggers.sql
-            relativeToChangelogFile: true
-            stripComments: false
-            splitStatements: false
+
   - changeSet:
       id: f48415fc-1a9f-414a-ad51-b9820ec6f41f
       author: natalia chala

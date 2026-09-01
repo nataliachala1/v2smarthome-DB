@@ -14,7 +14,7 @@
 -- Dependencias: 01_ddl/03_tables/003_create_devices_tables.sql
 -- ============================================================
 
-INSERT INTO devices.type_device (id_type_device, nombre, descripcion, icono, created_at, updated_at)
+INSERT INTO devices.device_type (id_device_type, name, description, icon, created_at, updated_at)
 VALUES
   (gen_random_uuid(), 'Lámpara inteligente', 'Bombilla o lámpara con control remoto de encendido/apagado y consumo medible',        'lamp',      NOW(), NOW()),
   (gen_random_uuid(), 'Enchufe inteligente', 'Enchufe con monitoreo de consumo y control remoto',                                   'plug',      NOW(), NOW()),
@@ -29,4 +29,4 @@ VALUES
   (gen_random_uuid(), 'Ventilador',          'Ventilador con control remoto y monitoreo de consumo',                                'fan',       NOW(), NOW()),
   (gen_random_uuid(), 'Cargador',            'Punto de carga para dispositivos móviles o vehículos eléctricos',                     'charger',   NOW(), NOW()),
   (gen_random_uuid(), 'Otro',               'Dispositivo genérico no clasificado en las categorías anteriores',                    'device',    NOW(), NOW())
-ON CONFLICT (nombre) DO NOTHING;
+ON CONFLICT (name) DO NOTHING;

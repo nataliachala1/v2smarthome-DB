@@ -50,19 +50,19 @@ CREATE INDEX IF NOT EXISTS idx_consumption_metric_id_home
 
 -- Filtrado por tipo de periodo (hora, dia, semana, mes)
 CREATE INDEX IF NOT EXISTS idx_consumption_metric_periodo
-  ON consumption.consumption_metric (periodo);
+  ON consumption.consumption_metric (period);
 
 -- Filtrado por fecha de inicio del periodo
 CREATE INDEX IF NOT EXISTS idx_consumption_metric_fecha_inicio
-  ON consumption.consumption_metric (fecha_inicio DESC);
+  ON consumption.consumption_metric (start_at DESC);
 
 -- Compuesto: dispositivo + periodo + fecha (métrica específica de un dispositivo)
 CREATE INDEX IF NOT EXISTS idx_consumption_metric_device_periodo_fecha
-  ON consumption.consumption_metric (id_device, periodo, fecha_inicio DESC);
+  ON consumption.consumption_metric (id_device, period, start_at DESC);
 
 -- Compuesto: hogar + periodo + fecha (métricas del hogar por tipo de periodo)
 CREATE INDEX IF NOT EXISTS idx_consumption_metric_home_periodo_fecha
-  ON consumption.consumption_metric (id_home, periodo, fecha_inicio DESC);
+  ON consumption.consumption_metric (id_home, period, start_at DESC);
 
 -- ============================================================
 -- TABLA: consumption.recommendation
@@ -75,20 +75,20 @@ CREATE INDEX IF NOT EXISTS idx_recommendation_id_home
 
 -- Filtrado por prioridad (alta, media, baja)
 CREATE INDEX IF NOT EXISTS idx_recommendation_prioridad
-  ON consumption.recommendation (prioridad)
+  ON consumption.recommendation (priority)
   WHERE deleted_at IS NULL;
 
 -- Filtrado por estado (pendiente, implementada, descartada)
 CREATE INDEX IF NOT EXISTS idx_recommendation_estado
-  ON consumption.recommendation (estado)
+  ON consumption.recommendation (status)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: hogar + estado (recomendaciones pendientes de un hogar)
 CREATE INDEX IF NOT EXISTS idx_recommendation_home_estado
-  ON consumption.recommendation (id_home, estado)
+  ON consumption.recommendation (id_home, status)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: hogar + prioridad (recomendaciones ordenadas por impacto)
 CREATE INDEX IF NOT EXISTS idx_recommendation_home_prioridad
-  ON consumption.recommendation (id_home, prioridad)
+  ON consumption.recommendation (id_home, priority)
   WHERE deleted_at IS NULL;

@@ -9,6 +9,12 @@ databaseChangeLog:
             path: 001_grants_auth.sql
             relativeToChangelogFile: true
             stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/002_grants_auth.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+
   - changeSet:
       id: f6b7b256-3169-4391-baec-429c2b87275e
       author: natalia chala
@@ -19,6 +25,12 @@ databaseChangeLog:
             path: 002_grants_homes.sql
             relativeToChangelogFile: true
             stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/002_grants_homes.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            
   - changeSet:
       id: 8b3759b0-e1f9-479a-ae61-ef74f8904612
       author: natalia chala
@@ -29,6 +41,17 @@ databaseChangeLog:
             path: 003_grants_devices.sql
             relativeToChangelogFile: true
             stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/003_grants_devices.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/003_grants_devices.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            
   - changeSet:
       id: 9c4860c1-f2g0-580b-b512-f5d878015723
       author: natalia chala
@@ -49,6 +72,12 @@ databaseChangeLog:
             path: 005_grants_notifications.sql
             relativeToChangelogFile: true
             stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/005_grants_notifications.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+
   - changeSet:
       id: b2c3d4e5-f6g7-8901-b2c3-d4e5f6g78901
       author: natalia chala
@@ -59,6 +88,12 @@ databaseChangeLog:
             path: 006_grants_sync.sql
             relativeToChangelogFile: true
             stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/006_grants_sync.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            
   - changeSet:
       id: 04ad6d88-2518-464f-b0e9-49957fb20762
       author: natalia chala
@@ -69,6 +104,12 @@ databaseChangeLog:
             path: 007_grants_config.sql
             relativeToChangelogFile: true
             stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/007_grants_config.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            
   - changeSet:
       id: c5e7f9a0-3b1c-4d2e-8f9a-1b2c3d4e5f6g
       author: natalia chala
@@ -77,5 +118,10 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: 008_grants_audit.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/008_grants_audit.rollback.sql
             relativeToChangelogFile: true
             stripComments: false

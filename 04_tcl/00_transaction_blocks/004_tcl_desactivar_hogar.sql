@@ -21,7 +21,7 @@ BEGIN;
   -- 1. Soft delete del hogar
   UPDATE homes.home
   SET
-    estado     = 'desactivado',
+    status     = 'desactivado',
     deleted_at = NOW(),
     updated_at = NOW()
   WHERE id_home    = :id_home
@@ -40,7 +40,7 @@ BEGIN;
   -- 3. Soft delete de dispositivos del hogar
   UPDATE devices.device
   SET
-    estado     = 'desactivado',
+    status     = 'desactivado',
     deleted_at = NOW(),
     updated_at = NOW()
   WHERE id_home    = :id_home

@@ -39,13 +39,13 @@ BEGIN
   -- Se detecta cuando solo cambia intentos_fallidos
   -- --------------------------------------------------------
   IF NEW.intentos_fallidos > OLD.intentos_fallidos
-    AND NEW.estado = OLD.estado THEN
+    AND NEW.status = OLD.status THEN
 
     -- Verificar si se alcanzó el límite máximo
     IF NEW.intentos_fallidos >= v_max_intentos THEN
 
       -- Bloquear la cuenta automáticamente
-      NEW.estado          = 'bloqueado';
+      NEW.status          = 'bloqueado';
       NEW.bloqueado_hasta = NOW() + v_tiempo_bloqueo;
 
     END IF;
@@ -56,8 +56,8 @@ BEGIN
   -- Caso 2: Reseteo de intentos al autenticarse con éxito
   -- Se detecta cuando el estado cambia a activo
   -- --------------------------------------------------------
-  IF NEW.estado = 'activo'
-    AND OLD.estado = 'bloqueado' THEN
+  IF NEW.status = 'activo'
+    AND OLD.status = 'bloqueado' THEN
 
     NEW.intentos_fallidos = 0;
     NEW.bloqueado_hasta   = NULL;
@@ -68,8 +68,8 @@ BEGIN
   -- Caso 3: Cuenta bloqueada o desactivada
   -- Cerrar todas las sesiones activas del usuario
   -- --------------------------------------------------------
-  IF (NEW.estado IN ('bloqueado', 'desactivado'))
-    AND OLD.estado NOT IN ('bloqueado', 'desactivado') THEN
+  IF (NEW.status IN ('bloqueado', 'desactivado'))
+    AND OLD.status NOT IN ('bloqueado', 'desactivado') THEN
 
     -- Revocar todas las sesiones activas
     UPDATE auth.session
@@ -94,8 +94,8 @@ BEGIN
       token,
       id_user,
       CASE
-        WHEN NEW.estado = 'bloqueado'    THEN 'desactivacion'
-        WHEN NEW.estado = 'desactivado'  THEN 'desactivacion'
+        WHEN NEW.status = 'bloqueado'    THEN 'desactivacion'
+        WHEN NEW.status = 'desactivado'  THEN 'desactivacion'
       END,
       NOW(),
       expira_en
@@ -177,44 +177,3 @@ $$;
 
 COMMENT ON FUNCTION fn_auth_cambio_password()
   IS 'Revoca todas las sesiones activas y registra tokens en blacklist cuando el usuario cambia su contraseña.';
-
--- ============================================================
--- FUNCIÓN: fn_auth_mfa_reset
--- Descripción: Resetea el contador de intentos fallidos
---              de MFA cuando el usuario se autentica
---              correctamente con el segundo factor
--- Referencia SRS: RF1.3.1
--- ============================================================
-CREATE OR REPLACE FUNCTION fn_auth_mfa_reset()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-
-  -- --------------------------------------------------------
-  -- Detectar uso exitoso del código MFA
-  -- Se detecta cuando el código expira y fue usado
-  -- --------------------------------------------------------
-  IF NEW.usado = TRUE
-    AND OLD.usado = FALSE THEN
-
-    -- Resetear intentos fallidos de MFA
-    UPDATE auth.mfa
-    SET
-      intentos_fallidos = 0,
-      updated_at        = NOW()
-    WHERE id_user = (
-      SELECT id_user
-      FROM auth.recovery_token
-      WHERE id_recovery_token = NEW.id_recovery_token
-    );
-
-  END IF;
-
-  RETURN NEW;
-
-END;
-$$;
-
-COMMENT ON FUNCTION fn_auth_mfa_reset()
-  IS 'Resetea el contador de intentos fallidos de MFA cuando el usuario completa exitosamente la verificación del segundo factor.';

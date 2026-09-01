@@ -47,7 +47,7 @@ BEGIN;
   DECLARE
     v_estado VARCHAR(20);
   BEGIN
-    SELECT estado INTO v_estado
+    SELECT status INTO v_estado
     FROM sync.backup
     WHERE id_backup = :'id_backup'::UUID;
 
@@ -95,11 +95,11 @@ BEGIN;
   INSERT INTO sync.backup (
     id_backup,
     id_user,
-    tipo,
-    alcance,
-    ubicacion,
-    estado,
-    descripcion,
+    type,
+    scope,
+    location,
+    status,
+    description,
     created_at
   )
   VALUES (

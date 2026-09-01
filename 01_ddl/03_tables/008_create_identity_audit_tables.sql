@@ -1,30 +1,88 @@
 -- ============================================================
 -- TABLA: identity_audit.audit_log
--- Almacena eventos de auditoría SEMÁNTICOS enviados
--- explícitamente por NestJS (§20, §24). PostgreSQL solo persiste;
--- no clasifica ni genera automáticamente estos registros.
--- Referencia: §25, §26, §27 del alcance actualizado; RF7.1
+--
+-- Auditoría semántica generada explícitamente por NestJS.
+-- PostgreSQL persiste y protege la integridad del histórico.
+--
+-- NO utiliza snapshots completos OLD/NEW.
+-- NO contiene contraseñas, hashes, JWT, tokens originales,
+-- credenciales MQTT ni secretos de integraciones.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS identity_audit.audit_log (
-  id_audit_log UUID        NOT NULL DEFAULT gen_random_uuid(),
-  id_user      UUID        NULL,
-  id_home      UUID        NULL,
-  action       VARCHAR(60) NOT NULL,
-  module       VARCHAR(50) NOT NULL,
-  entity       VARCHAR(50) NULL,
-  id_entity    UUID        NULL,
-  result       VARCHAR(10) NOT NULL DEFAULT 'success',
-  detail       TEXT        NULL,
-  metadata     JSONB       NULL,
-  ip_address   VARCHAR(45) NULL,
-  user_agent   TEXT        NULL,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  CONSTRAINT pk_audit_log        PRIMARY KEY (id_audit_log),
-  CONSTRAINT ck_audit_log_result CHECK (result IN ('success', 'failure'))
+CREATE TABLE IF NOT EXISTS identity_audit.audit_log (
+
+    id_audit_log UUID NOT NULL DEFAULT gen_random_uuid(),
+
+    -- Usuario que originó la operación.
+    -- Puede ser NULL para eventos de sistema o usuarios
+    -- todavía no identificados, por ejemplo login fallido.
+    id_user UUID NULL,
+
+    -- Hogar relacionado cuando el evento sea contextual.
+    id_home UUID NULL,
+
+    -- Tipo lógico de actor.
+    actor_type VARCHAR(20) NOT NULL DEFAULT 'USER',
+
+    -- Evento semántico.
+    -- Ejemplos:
+    -- AUTH_LOGIN_SUCCESS
+    -- AUTH_LOGIN_FAILED
+    -- HOME_CREATED
+    -- HOME_MEMBER_INVITED
+    -- DEVICE_DEACTIVATED
+    -- DEVICE_CONTROL_ON
+    action VARCHAR(80) NOT NULL,
+
+    -- Dominio que genera el evento.
+    -- AUTH, HOMES, DEVICES, CONFIG, etc.
+    module VARCHAR(50) NOT NULL,
+
+    -- Entidad relacionada.
+    entity VARCHAR(50) NULL,
+
+    -- Identificador de la entidad cuando corresponda.
+    id_entity UUID NULL,
+
+    -- Resultado cuando aplique.
+    result VARCHAR(20) NULL,
+
+    -- Únicamente contexto sanitizado necesario.
+    metadata JSONB NOT NULL DEFAULT '{}'::JSONB,
+
+    -- Datos técnicos opcionales.
+    ip_address INET NULL,
+    user_agent TEXT NULL,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT pk_audit_log
+        PRIMARY KEY (id_audit_log),
+
+    CONSTRAINT ck_audit_log_actor_type
+        CHECK (
+            actor_type IN (
+                'USER',
+                'SYSTEM',
+                'INFRASTRUCTURE'
+            )
+        ),
+
+    CONSTRAINT ck_audit_log_result
+        CHECK (
+            result IS NULL
+            OR result IN ('SUCCESS', 'FAILURE')
+        )
 );
 
+
 COMMENT ON TABLE identity_audit.audit_log IS
-  'Registro inmutable de eventos de auditoría semántica. Las filas las inserta NestJS explícitamente (no triggers de PostgreSQL) tras evaluar qué constituye un evento auditable, según §20/§24 del alcance.';
-COMMENT ON COLUMN identity_audit.audit_log.action   IS 'Nombre del evento en convención "modulo.evento", ej: auth.login_success, home.created, member.invited, device.control_executed.';
-COMMENT ON COLUMN identity_audit.audit_log.metadata IS 'Contexto mínimo necesario del evento (nunca snapshot completo de fila). Ej: {"previous_role":"MEMBER","new_role":"OWNER"}. Nunca contraseñas, hashes, JWT, tokens ni secretos (§27).';
+'Registro inmutable de eventos semánticos de auditoría generados explícitamente por NestJS.';
+
+
+COMMENT ON COLUMN identity_audit.audit_log.action IS
+'Código semántico del evento, por ejemplo AUTH_LOGIN_SUCCESS, HOME_CREATED o DEVICE_CONTROL_ON.';
+
+
+COMMENT ON COLUMN identity_audit.audit_log.metadata IS
+'Contexto mínimo sanitizado del evento. Nunca contiene contraseñas, hashes, JWT, tokens originales, credenciales MQTT ni secretos.';

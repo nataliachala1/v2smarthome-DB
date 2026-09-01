@@ -22,7 +22,7 @@ CREATE INDEX IF NOT EXISTS idx_notification_leida
 
 -- Filtrado por tipo de notificación
 CREATE INDEX IF NOT EXISTS idx_notification_tipo
-  ON notifications.notification (tipo)
+  ON notifications.notification (type)
   WHERE deleted_at IS NULL;
 
 -- Ordenamiento cronológico (más recientes primero)
@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_notification_created_at
 
 -- Filtrado por prioridad (alertas críticas)
 CREATE INDEX IF NOT EXISTS idx_notification_prioridad
-  ON notifications.notification (prioridad)
+  ON notifications.notification (priority)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: usuario + fecha (notificaciones recientes de un usuario)
@@ -42,7 +42,7 @@ CREATE INDEX IF NOT EXISTS idx_notification_user_created_at
 
 -- Compuesto: usuario + tipo (filtrar notificaciones por categoría)
 CREATE INDEX IF NOT EXISTS idx_notification_user_tipo
-  ON notifications.notification (id_user, tipo)
+  ON notifications.notification (id_user, type)
   WHERE deleted_at IS NULL;
 
 -- Compuesto: usuario + no leída + fecha (bandeja de entrada)

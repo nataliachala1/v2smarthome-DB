@@ -19,12 +19,12 @@ BEGIN;
 
   -- 1. Insertar dispositivo
   INSERT INTO devices.device (
-    id_device, id_home, id_zone, id_type_device,
-    nombre, estado, encendido, protocolo, created_at, updated_at
+    id_device, id_home, id_zone, id_device_type,
+    name, status, is_on, transport_type, created_at, updated_at
   )
   VALUES (
-    :id_device, :id_home, :id_zone, :id_type_device,
-    :nombre, 'desconectado', FALSE, :protocolo,
+    :id_device, :id_home, :id_zone, :id_device_type,
+    :name, 'OFFLINE', FALSE, :transport_type,
     NOW(), NOW()
   );
 
@@ -32,37 +32,37 @@ BEGIN;
 
   -- 2. Insertar registro extendido (dispositivo inteligente)
   INSERT INTO devices.smart_device (
-    id_smart_device, id_device, modelo, fabricante,
-    capacidad_maxima_w, created_at, updated_at
+    id_smart_device, id_device, model, manufacturer,
+    max_capacity_w, created_at, updated_at
   )
   VALUES (
-    gen_random_uuid(), :id_device, :modelo, :fabricante,
-    :capacidad_maxima_w, NOW(), NOW()
+    gen_random_uuid(), :id_device, :model, :manufacturer,
+    :max_capacity_w, NOW(), NOW()
   );
 
   SAVEPOINT sp_smart_device_creado;
 
   -- 3. Registrar estado inicial en historial
   INSERT INTO devices.device_status_history (
-    id_device_status_history, id_device, estado_anterior,
-    estado_nuevo, encendido, origen, id_user, created_at
+    id_device_status_history, id_device, previous_status,
+    new_status, is_on, source, id_user, created_at
   )
   VALUES (
     gen_random_uuid(), :id_device, NULL,
-    'desconectado', FALSE, 'sistema', :id_user, NOW()
+    'OFFLINE', FALSE, 'SYSTEM', :id_user, NOW()
   );
 
   SAVEPOINT sp_historial_creado;
 
   -- 4. Registrar en auditoría
   INSERT INTO identity_audit.audit_log (
-    id_audit_log, id_user, accion, modulo,
-    entidad, id_entidad, resultado, detalle, created_at
+    id_audit_log, id_user, action, module,
+    entity, id_entity, result, detail, created_at
   )
   VALUES (
-    gen_random_uuid(), :id_user, 'crear', 'dispositivos',
+    gen_random_uuid(), :id_user, 'CREATE', 'devices',
     'device', :id_device, 'exitoso',
-    CONCAT('Registro de nuevo dispositivo: ', :nombre),
+    CONCAT('Registro de nuevo dispositivo: ', :name),
     NOW()
   );
 

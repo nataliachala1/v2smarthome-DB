@@ -38,7 +38,7 @@ BEGIN
   SELECT nombre INTO v_nombre_hogar
   FROM homes.home
   WHERE id_home    = p_id_home
-    AND estado     = 'activo'
+    AND status     = 'activo'
     AND deleted_at IS NULL;
 
   IF v_nombre_hogar IS NULL THEN
@@ -51,7 +51,7 @@ BEGIN
   -- --------------------------------------------------------
   UPDATE homes.home
   SET
-    estado     = 'desactivado',
+    status     = 'desactivado',
     deleted_at = NOW(),
     updated_at = NOW()
   WHERE id_home = p_id_home;
@@ -76,7 +76,7 @@ BEGIN
 
   UPDATE devices.device
   SET
-    estado     = 'desactivado',
+    status     = 'desactivado',
     encendido  = FALSE,
     deleted_at = NOW(),
     updated_at = NOW()

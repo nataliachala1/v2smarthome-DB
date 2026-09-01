@@ -33,9 +33,9 @@ SELECT
   h.nombre                          AS nombre_hogar,
   td.nombre                         AS tipo_dispositivo,
   SUM(c.kwh_acumulado)              AS kwh_total_30_dias,
-  SUM(c.costo_estimado) FILTER (WHERE c.costo_estimado IS NOT NULL) AS costo_total_30_dias,
-  COUNT(*) FILTER (WHERE c.costo_estimado IS NULL) AS lecturas_sin_costo,
-  AVG(c.watts)                      AS watts_promedio,
+  SUM(c.estimated_cost) FILTER (WHERE c.estimated_cost IS NOT NULL) AS costo_total_30_dias,
+  COUNT(*) FILTER (WHERE c.estimated_cost IS NULL) AS lecturas_sin_costo,
+  AVG(c.watts)                      AS average_watts,
   RANK() OVER (
     PARTITION BY d.id_home
     ORDER BY SUM(c.kwh_acumulado) DESC

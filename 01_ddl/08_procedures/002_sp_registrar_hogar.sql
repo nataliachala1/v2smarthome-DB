@@ -32,7 +32,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM auth.user
     WHERE id_user    = p_id_user
-      AND estado     = 'activo'
+      AND status     = 'ACTIVE'
       AND deleted_at IS NULL
   ) THEN
     RAISE EXCEPTION 'El usuario no existe o no está activo.';
@@ -45,10 +45,10 @@ BEGIN
   p_id_home := gen_random_uuid();
 
   INSERT INTO homes.home (
-    id_home, id_user, nombre, estrato, estado, created_at, updated_at
+    id_home, created_by, name, stratum, status, created_at, updated_at
   )
   VALUES (
-    p_id_home, p_id_user, p_nombre, p_estrato, 'activo', NOW(), NOW()
+    p_id_home, p_id_user, p_nombre, p_estrato, 'ACTIVE', NOW(), NOW()
   );
 
   -- --------------------------------------------------------

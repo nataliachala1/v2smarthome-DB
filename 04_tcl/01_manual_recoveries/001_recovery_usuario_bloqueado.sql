@@ -2,8 +2,8 @@
 BEGIN;
 
   UPDATE auth.user
-  SET estado = 'activo', intentos_fallidos = 0, updated_at = NOW()
-  WHERE id_user = :id_user AND estado = 'bloqueado';
+  SET status = 'activo', intentos_fallidos = 0, updated_at = NOW()
+  WHERE id_user = :id_user AND status = 'bloqueado';
 
   INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,

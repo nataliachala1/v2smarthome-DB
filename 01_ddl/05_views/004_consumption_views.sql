@@ -36,7 +36,7 @@ SELECT DISTINCT ON (c.id_device)
   a.nombre        AS nombre_zona,
   c.watts,
   c.kwh_acumulado,
-  c.costo_estimado,
+  c.estimated_cost,
   c.fecha_lectura
 FROM consumption.consumption c
 JOIN devices.device          d ON d.id_device   = c.id_device
@@ -65,14 +65,14 @@ SELECT
   COUNT(DISTINCT d.id_device)       AS total_dispositivos,
   COALESCE(SUM(uc.watts), 0)        AS watts_totales,
   COALESCE(SUM(uc.kwh_acumulado), 0) AS kwh_acumulado_total,
-  COALESCE(SUM(uc.costo_estimado), 0) AS costo_estimado_total
+  COALESCE(SUM(uc.estimated_cost), 0) AS costo_estimado_total
 FROM homes.home h
 LEFT JOIN devices.device          d  ON d.id_home    = h.id_home
                                       AND d.deleted_at IS NULL
 LEFT JOIN consumption.vw_consumo_tiempo_real uc
                                       ON uc.id_device = d.id_device
 WHERE h.deleted_at IS NULL
-  AND h.estado     = 'activo'
+  AND h.status     = 'activo'
 GROUP BY h.id_home, h.nombre;
 
 COMMENT ON VIEW consumption.vw_consumo_total_hogar
@@ -93,14 +93,14 @@ SELECT
   h.nombre        AS nombre_hogar,
   cm.id_device,
   d.nombre        AS nombre_dispositivo,
-  cm.periodo,
-  cm.fecha_inicio,
-  cm.fecha_fin,
+  cm.period,
+  cm.start_at,
+  cm.end_at,
   cm.kwh_total,
-  cm.costo_total,
-  cm.watts_promedio,
-  cm.watts_maximo,
-  cm.watts_minimo
+  cm.total_cost,
+  cm.average_watts,
+  cm.max_watts,
+  cm.min_watts
 FROM consumption.consumption_metric cm
 JOIN homes.home                     h ON h.id_home    = cm.id_home
                                       AND h.deleted_at IS NULL
@@ -125,26 +125,26 @@ SELECT
   h.nombre        AS nombre_hogar,
   r.id_device,
   d.nombre        AS nombre_dispositivo,
-  r.titulo,
-  r.descripcion,
-  r.ahorro_estimado_kwh,
-  r.ahorro_estimado_costo,
-  r.prioridad,
+  r.title,
+  r.description,
+  r.estimated_savings_kwh,
+  r.estimated_savings_cost,
+  r.priority,
   r.created_at
 FROM consumption.recommendation r
 JOIN homes.home                  h ON h.id_home    = r.id_home
                                     AND h.deleted_at IS NULL
 LEFT JOIN devices.device         d ON d.id_device  = r.id_device
                                     AND d.deleted_at IS NULL
-WHERE r.estado     = 'pendiente'
+WHERE r.status     = 'pendiente'
   AND r.deleted_at IS NULL
 ORDER BY
-  CASE r.prioridad
+  CASE r.priority
     WHEN 'alta'  THEN 1
     WHEN 'media' THEN 2
     WHEN 'baja'  THEN 3
   END,
-  r.ahorro_estimado_costo DESC NULLS LAST;
+  r.estimated_savings_cost DESC NULLS LAST;
 
 COMMENT ON VIEW consumption.vw_recomendaciones_pendientes
   IS 'Recomendaciones de ahorro pendientes de implementar, ordenadas por prioridad y ahorro estimado.';
@@ -163,10 +163,10 @@ SELECT
   n.id_user,
   n.id_home,
   n.id_device,
-  n.tipo,
-  n.titulo,
+  n.type,
+  n.title,
   n.mensaje,
-  n.prioridad,
+  n.priority,
   n.canal,
   n.created_at
 FROM notifications.notification n

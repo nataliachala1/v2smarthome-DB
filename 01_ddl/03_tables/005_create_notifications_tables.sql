@@ -46,16 +46,49 @@ CREATE TABLE IF NOT EXISTS notifications.notification (
 
 -- ============================================================
 CREATE TABLE IF NOT EXISTS notifications.alert (
-  id_alert        UUID          NOT NULL DEFAULT gen_random_uuid(),
-  id_alert_rule   UUID          NOT NULL,
-  id_device       UUID          NOT NULL,
-  id_home         UUID          NOT NULL,
-  detected_value  NUMERIC(12,6) NOT NULL,
-  limit_value     NUMERIC(10,4) NOT NULL,
-  action_executed VARCHAR(20)   NULL,
-  created_at      TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    id_alert        UUID        NOT NULL DEFAULT gen_random_uuid(),
+    id_alert_rule   UUID        NULL,
+    id_device       UUID        NOT NULL,
+    id_home         UUID        NOT NULL,
+    alert_type      VARCHAR(20) NOT NULL,
+    detected_value  NUMERIC(12,6) NULL,
+    limit_value     NUMERIC(10,4) NULL,
+    action_executed VARCHAR(20) NULL,
+    metadata        JSONB NOT NULL DEFAULT '{}'::JSONB,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  CONSTRAINT pk_alert PRIMARY KEY (id_alert)
+    CONSTRAINT pk_alert PRIMARY KEY (id_alert),
+
+    CONSTRAINT ck_alert_type
+        CHECK (
+            alert_type IN (
+                'THRESHOLD',
+                'ANOMALY',
+                'DEVICE_EVENT'
+            )
+        ),
+
+    CONSTRAINT ck_alert_threshold_data
+        CHECK (
+            (
+                alert_type = 'THRESHOLD'
+                AND id_alert_rule IS NOT NULL
+                AND detected_value IS NOT NULL
+                AND limit_value IS NOT NULL
+            )
+            OR
+            (
+                alert_type IN ('ANOMALY', 'DEVICE_EVENT')
+                AND id_alert_rule IS NULL
+            )
+        ),
+
+    CONSTRAINT uq_alert_context
+        UNIQUE (
+            id_alert,
+            id_home,
+            id_device
+        )
 );
 
 -- ============================================================

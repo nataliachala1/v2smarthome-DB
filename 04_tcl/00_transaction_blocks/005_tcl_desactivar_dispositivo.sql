@@ -25,7 +25,7 @@ BEGIN;
   -- --------------------------------------------------------
   UPDATE devices.device
   SET
-    estado     = 'desactivado',
+    status     = 'desactivado',
     encendido  = FALSE,
     deleted_at = NOW(),
     updated_at = NOW()

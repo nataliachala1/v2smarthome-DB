@@ -23,15 +23,10 @@
 CREATE OR REPLACE VIEW auth.vw_usuarios_activos AS
 SELECT
   u.id_user,
-  u.nombre,
-  u.apellido,
-  u.username,
+  u.name,
   u.email,
-  u.tipo_documento,
-  u.numero_documento,
-  u.estado,
+  u.status,
   u.email_verificado,
-  u.mfa_habilitado,
   u.intentos_fallidos,
   u.bloqueado_hasta,
   u.created_at,
@@ -52,17 +47,15 @@ COMMENT ON VIEW auth.vw_usuarios_activos
 CREATE OR REPLACE VIEW auth.vw_usuarios_con_roles AS
 SELECT
   u.id_user,
-  u.nombre,
-  u.apellido,
-  u.username,
+  u.name,
   u.email,
-  u.estado,
+  u.status,
   r.id_role,
-  r.nombre        AS rol,
+  r.name          AS role,
   p.id_permission,
-  p.nombre        AS permiso,
-  p.modulo,
-  p.accion
+  p.name          AS permission,
+  p.module,
+  p.action
 FROM auth.user            u
 JOIN auth.user_role       ur ON ur.id_user       = u.id_user
                              AND ur.deleted_at    IS NULL
@@ -73,7 +66,7 @@ JOIN auth.role_permission rp ON rp.id_role        = r.id_role
 JOIN auth.permission      p  ON p.id_permission   = rp.id_permission
                              AND p.deleted_at      IS NULL
 WHERE u.deleted_at IS NULL
-  AND u.estado     = 'activo';
+  AND u.status     = 'activo';
 
 COMMENT ON VIEW auth.vw_usuarios_con_roles
   IS 'Usuarios activos con sus roles y permisos asociados. Facilita la validación de acceso en el backend.';
@@ -82,15 +75,13 @@ COMMENT ON VIEW auth.vw_usuarios_con_roles
 -- VISTA: auth.vw_sesiones_activas
 -- Descripción: Muestra todas las sesiones activas del sistema
 --              con información del usuario y tiempo restante
---              antes de expiración
--- Referencia SRS: RF1.2, RF1.4, RNF5.4
+  u.name,
 -- ============================================================
 CREATE OR REPLACE VIEW auth.vw_sesiones_activas AS
 SELECT
   s.id_session,
   s.id_user,
-  u.nombre,
-  u.apellido,
+  u.name              AS usuario_nombre,
   u.email,
   s.ip_address,
   s.user_agent,
@@ -98,8 +89,7 @@ SELECT
   s.created_at                              AS inicio_sesion,
   s.expira_en,
   EXTRACT(EPOCH FROM (s.expira_en - NOW()))
-    / 60                                    AS minutos_restantes
-FROM auth.session s
+  u.name,
 JOIN auth.user    u ON u.id_user    = s.id_user
                     AND u.deleted_at IS NULL
 WHERE s.activa     = TRUE
@@ -119,15 +109,14 @@ COMMENT ON VIEW auth.vw_sesiones_activas
 CREATE OR REPLACE VIEW auth.vw_cuentas_bloqueadas AS
 SELECT
   u.id_user,
-  u.nombre,
-  u.apellido,
+  u.name
   u.email,
   u.intentos_fallidos,
   u.bloqueado_hasta,
   EXTRACT(EPOCH FROM (u.bloqueado_hasta - NOW()))
-    / 60                                      AS minutos_restantes_bloqueo
+  u.name              AS usuario_nombre,
 FROM auth.user u
-WHERE u.estado       = 'bloqueado'
+WHERE u.status       = 'bloqueado'
   AND u.deleted_at   IS NULL
   AND u.bloqueado_hasta > NOW();
 
@@ -146,7 +135,7 @@ SELECT
   rt.id_recovery_token,
   rt.id_user,
   u.email,
-  rt.tipo,
+  rt.type,
   rt.expira_en,
   EXTRACT(EPOCH FROM (rt.expira_en - NOW()))
     / 60                                    AS minutos_restantes

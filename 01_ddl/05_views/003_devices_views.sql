@@ -24,22 +24,22 @@
 CREATE OR REPLACE VIEW devices.vw_dispositivos_activos AS
 SELECT
   d.id_device,
-  d.nombre,
-  d.estado,
-  d.encendido,
-  d.consumo_actual_w,
-  d.protocolo,
-  d.mac_address,
-  td.nombre        AS tipo_dispositivo,
-  td.icono,
+  d.id_home,
+  d.status,
+   d.is_on,
+   d.current_power_w,
+   d.transport_type,
+   d.manufacturer_device_id,
+  td.name          AS tipo_dispositivo,
+  td.icon,
   h.id_home,
-  h.nombre          AS nombre_hogar,
+  h.name            AS nombre_hogar,
   a.id_zone,
   a.name          AS nombre_zona,
   d.created_at,
   d.updated_at
 FROM devices.device      d
-JOIN devices.type_device td ON td.id_type_device = d.id_type_device
+  JOIN devices.device_type td ON td.id_device_type = d.id_device_type
                             AND td.deleted_at     IS NULL
 JOIN homes.home          h  ON h.id_home          = d.id_home
                             AND h.deleted_at       IS NULL
@@ -61,7 +61,7 @@ CREATE OR REPLACE VIEW devices.vw_dispositivos_desconectados AS
 SELECT
   d.id_device,
   d.nombre,
-  d.estado,
+  d.status,
   h.id_home,
   h.nombre        AS nombre_hogar,
   a.nombre        AS nombre_zona,
@@ -71,7 +71,7 @@ JOIN homes.home      h ON h.id_home = d.id_home
                        AND h.deleted_at IS NULL
 LEFT JOIN homes.zone a ON a.id_zone  = d.id_zone
                        AND a.deleted_at IS NULL
-WHERE d.estado     = 'desconectado'
+WHERE d.status     = 'desconectado'
   AND d.deleted_at IS NULL;
 
 COMMENT ON VIEW devices.vw_dispositivos_desconectados
@@ -121,7 +121,7 @@ SELECT
   d.nombre        AS nombre_dispositivo,
   h.id_home,
   h.nombre        AS nombre_hogar,
-  tr.tipo,
+  tr.type,
   tr.limite_kwh,
   tr.accion,
   tr.created_at,

@@ -20,7 +20,3 @@ ALTER TABLE homes.home_member
   FOREIGN KEY (id_user) REFERENCES auth.user (id_user),
   ADD CONSTRAINT fk_home_member_invited_by
   FOREIGN KEY (invited_by) REFERENCES auth.user (id_user) ON DELETE SET NULL;
-
-  -- 01_ddl/04_alter/002_add_alter_homes.sql (agregar al final)
-ALTER TABLE homes.zone
-  ADD CONSTRAINT uq_zone_id_zone_home UNIQUE (id_zone, id_home);

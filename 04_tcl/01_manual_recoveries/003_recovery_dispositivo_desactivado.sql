@@ -2,8 +2,8 @@
 BEGIN;
 
   UPDATE devices.device
-  SET estado = 'activo', encendido = FALSE, updated_at = NOW()
-  WHERE id_device = :id_device AND estado = 'desactivado';
+  SET status = 'activo', encendido = FALSE, updated_at = NOW()
+  WHERE id_device = :id_device AND status = 'desactivado';
 
   INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,

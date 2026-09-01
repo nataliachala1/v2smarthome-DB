@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS homes.zone (
   updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   deleted_at TIMESTAMPTZ  NULL,
 
-  CONSTRAINT pk_zone      PRIMARY KEY (id_zone),
-  CONSTRAINT uq_zone_name UNIQUE (id_home, name)
+  CONSTRAINT pk_zone               PRIMARY KEY (id_zone),
+  CONSTRAINT uq_zone_name          UNIQUE (id_home, name),
+  CONSTRAINT uq_zone_home_identity UNIQUE (id_zone, id_home)
 );
 
 -- ============================================================

@@ -34,14 +34,14 @@ CREATE TABLE IF NOT EXISTS consumption.consumption (
   power_w           NUMERIC(10,4) NOT NULL,
   energy_delta_kwh  NUMERIC(12,6) NOT NULL DEFAULT 0,
   energy_total_kwh  NUMERIC(14,6) NULL,
-  costo_estimado    NUMERIC(12,4) NULL,
+  estimated_cost    NUMERIC(12,4) NULL,
   read_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
 
   CONSTRAINT pk_consumption           PRIMARY KEY (id_consumption, read_at),
   CONSTRAINT ck_consumption_power     CHECK (power_w >= 0),
   CONSTRAINT ck_consumption_delta     CHECK (energy_delta_kwh >= 0),
   CONSTRAINT ck_consumption_total     CHECK (energy_total_kwh IS NULL OR energy_total_kwh >= 0),
-  CONSTRAINT ck_consumption_costo     CHECK (costo_estimado IS NULL OR costo_estimado >= 0)
+  CONSTRAINT ck_consumption_costo     CHECK (estimated_cost IS NULL OR estimated_cost >= 0)
 ) PARTITION BY RANGE (read_at);
 
 -- Nota: id_consumption ya no es único por sí solo (requisito de
@@ -77,32 +77,32 @@ CREATE TABLE IF NOT EXISTS consumption.consumption_metric (
   id_consumption_metric UUID          NOT NULL DEFAULT gen_random_uuid(),
   id_device             UUID          NOT NULL,
   id_home               UUID          NOT NULL,
-  periodo               VARCHAR(10)   NOT NULL,
-  fecha_inicio          TIMESTAMPTZ   NOT NULL,
-  fecha_fin             TIMESTAMPTZ   NOT NULL,
+  period               VARCHAR(10)   NOT NULL,
+  start_at          TIMESTAMPTZ   NOT NULL,
+  end_at             TIMESTAMPTZ   NOT NULL,
   kwh_total             NUMERIC(12,6) NOT NULL DEFAULT 0,
-  costo_total           NUMERIC(12,4) NULL,
-  watts_promedio        NUMERIC(10,4) NULL,
-  watts_maximo          NUMERIC(10,4) NULL,
-  watts_minimo          NUMERIC(10,4) NULL,
+  total_cost           NUMERIC(12,4) NULL,
+  average_watts        NUMERIC(10,4) NULL,
+  max_watts          NUMERIC(10,4) NULL,
+  min_watts          NUMERIC(10,4) NULL,
   created_at            TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   updated_at            TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
 
   CONSTRAINT pk_consumption_metric          PRIMARY KEY (id_consumption_metric),
-  CONSTRAINT uq_consumption_metric          UNIQUE (id_device, periodo, fecha_inicio),
-  CONSTRAINT ck_consumption_metric_periodo  CHECK (periodo IN ('hora', 'dia', 'semana', 'mes')),
-  CONSTRAINT ck_consumption_metric_fechas   CHECK (fecha_fin > fecha_inicio),
+  CONSTRAINT uq_consumption_metric          UNIQUE (id_device, period, start_at),
+  CONSTRAINT ck_consumption_metric_periodo  CHECK (period IN ('hora', 'dia', 'semana', 'mes')),
+  CONSTRAINT ck_consumption_metric_fechas   CHECK (end_at > start_at),
   CONSTRAINT ck_consumption_metric_kwh      CHECK (kwh_total >= 0),
-  CONSTRAINT ck_consumption_metric_costo    CHECK (costo_total IS NULL OR costo_total >= 0),
+  CONSTRAINT ck_consumption_metric_costo    CHECK (total_cost IS NULL OR total_cost >= 0),
   CONSTRAINT ck_consumption_metric_watts    CHECK (
-    (watts_promedio IS NULL OR watts_promedio >= 0) AND
-    (watts_maximo   IS NULL OR watts_maximo   >= 0) AND
-    (watts_minimo   IS NULL OR watts_minimo   >= 0)
+    (average_watts IS NULL OR average_watts >= 0) AND
+    (max_watts   IS NULL OR max_watts   >= 0) AND
+    (min_watts   IS NULL OR min_watts   >= 0)
   ),
   CONSTRAINT ck_consumption_metric_max_min  CHECK (
-    watts_maximo IS NULL OR
-    watts_minimo IS NULL OR
-    watts_maximo >= watts_minimo
+    max_watts IS NULL OR
+    min_watts IS NULL OR
+    max_watts >= min_watts
   )
 );
 
@@ -115,19 +115,19 @@ CREATE TABLE IF NOT EXISTS consumption.recommendation (
   id_recommendation      UUID          NOT NULL DEFAULT gen_random_uuid(),
   id_home                UUID          NOT NULL,
   id_device              UUID          NULL,
-  titulo                 VARCHAR(200)  NOT NULL,
-  descripcion            TEXT          NOT NULL,
-  ahorro_estimado_kwh    NUMERIC(10,4) NULL,
-  ahorro_estimado_costo  NUMERIC(12,4) NULL,
-  prioridad              VARCHAR(10)   NOT NULL DEFAULT 'media',
-  estado                 VARCHAR(20)   NOT NULL DEFAULT 'pendiente',
+  title                 VARCHAR(200)  NOT NULL,
+  description            TEXT          NOT NULL,
+  estimated_savings_kwh    NUMERIC(10,4) NULL,
+  estimated_savings_cost  NUMERIC(12,4) NULL,
+  priority              VARCHAR(10)   NOT NULL DEFAULT 'media',
+  status                 VARCHAR(20)   NOT NULL DEFAULT 'pendiente',
   created_at             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   updated_at             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   deleted_at             TIMESTAMPTZ   NULL,
 
   CONSTRAINT pk_recommendation           PRIMARY KEY (id_recommendation),
-  CONSTRAINT ck_recommendation_prioridad CHECK (prioridad IN ('alta', 'media', 'baja')),
-  CONSTRAINT ck_recommendation_estado    CHECK (estado IN ('pendiente', 'implementada', 'descartada')),
-  CONSTRAINT ck_recommendation_ahorro_kwh  CHECK (ahorro_estimado_kwh  IS NULL OR ahorro_estimado_kwh  > 0),
-  CONSTRAINT ck_recommendation_ahorro_cost CHECK (ahorro_estimado_costo IS NULL OR ahorro_estimado_costo > 0)
+  CONSTRAINT ck_recommendation_prioridad CHECK (priority IN ('alta', 'media', 'baja')),
+  CONSTRAINT ck_recommendation_estado    CHECK (status IN ('pendiente', 'implementada', 'descartada')),
+  CONSTRAINT ck_recommendation_ahorro_kwh  CHECK (estimated_savings_kwh  IS NULL OR estimated_savings_kwh  > 0),
+  CONSTRAINT ck_recommendation_ahorro_cost CHECK (estimated_savings_cost IS NULL OR estimated_savings_cost > 0)
 );

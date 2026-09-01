@@ -26,15 +26,15 @@ CREATE OR REPLACE VIEW identity_audit.vw_logs_recientes AS
 SELECT
   al.id_audit_log,
   al.id_user,
-  u.nombre        AS nombre_usuario,
+  u.name          AS user_name,
   u.apellido      AS apellido_usuario,
   u.email         AS email_usuario,
-  al.accion,
-  al.modulo,
+  al.action,
+  al.module,
   al.entidad,
   al.id_entidad,
   al.ip_address,
-  al.resultado,
+  al.result,
   al.detalle,
   al.created_at
 FROM identity_audit.audit_log al
@@ -55,15 +55,15 @@ COMMENT ON VIEW identity_audit.vw_logs_recientes
 -- ============================================================
 CREATE OR REPLACE VIEW identity_audit.vw_resumen_por_modulo AS
 SELECT
-  al.modulo,
-  al.accion,
-  al.resultado,
+  al.module,
+  al.action,
+  al.result,
   COUNT(*)                       AS total_registros,
   MAX(al.created_at)             AS ultima_ocurrencia
 FROM identity_audit.audit_log al
 WHERE al.created_at > NOW() - INTERVAL '30 days'
-GROUP BY al.modulo, al.accion, al.resultado
-ORDER BY al.modulo, total_registros DESC;
+GROUP BY al.module, al.action, al.result
+ORDER BY al.module, total_registros DESC;
 
 COMMENT ON VIEW identity_audit.vw_resumen_por_modulo
   IS 'Resumen estadístico de acciones de auditoría agrupadas por módulo, acción y resultado en los últimos 30 días.';
@@ -80,17 +80,17 @@ CREATE OR REPLACE VIEW identity_audit.vw_eventos_fallidos AS
 SELECT
   al.id_audit_log,
   al.id_user,
-  u.nombre        AS nombre_usuario,
+  u.name          AS user_name,
   u.email         AS email_usuario,
-  al.accion,
-  al.modulo,
+  al.action,
+  al.module,
   al.entidad,
   al.ip_address,
   al.detalle,
   al.created_at
 FROM identity_audit.audit_log al
 LEFT JOIN auth.user  u ON u.id_user = al.id_user
-WHERE al.resultado = 'fallido'
+WHERE al.result = 'failure'
 ORDER BY al.created_at DESC;
 
 COMMENT ON VIEW identity_audit.vw_eventos_fallidos
@@ -107,18 +107,17 @@ COMMENT ON VIEW identity_audit.vw_eventos_fallidos
 CREATE OR REPLACE VIEW identity_audit.vw_actividad_por_usuario AS
 SELECT
   al.id_user,
-  u.nombre        AS nombre_usuario,
-  u.apellido      AS apellido_usuario,
+  u.name          AS user_name,
   u.email         AS email_usuario,
   COUNT(*)                                                   AS total_acciones,
-  COUNT(*) FILTER (WHERE al.resultado = 'exitoso')            AS acciones_exitosas,
-  COUNT(*) FILTER (WHERE al.resultado = 'fallido')            AS acciones_fallidas,
+  COUNT(*) FILTER (WHERE al.result = 'success')            AS successful_actions,
+  COUNT(*) FILTER (WHERE al.result = 'failure')            AS failed_actions,
   MAX(al.created_at)                                          AS ultima_actividad
 FROM identity_audit.audit_log al
 JOIN auth.user        u ON u.id_user = al.id_user
                         AND u.deleted_at IS NULL
 WHERE al.created_at > NOW() - INTERVAL '30 days'
-GROUP BY al.id_user, u.nombre, u.apellido, u.email
+GROUP BY al.id_user, u.name, u.email
 ORDER BY total_acciones DESC;
 
 COMMENT ON VIEW identity_audit.vw_actividad_por_usuario
@@ -135,16 +134,16 @@ CREATE OR REPLACE VIEW identity_audit.vw_logs_inicio_cierre_sesion AS
 SELECT
   al.id_audit_log,
   al.id_user,
-  u.nombre        AS nombre_usuario,
+  u.name          AS user_name,
   u.email         AS email_usuario,
-  al.accion,
+  al.action,
   al.ip_address,
   al.user_agent,
-  al.resultado,
+  al.result,
   al.created_at
 FROM identity_audit.audit_log al
 LEFT JOIN auth.user  u ON u.id_user = al.id_user
-WHERE al.accion IN ('login', 'logout')
+WHERE al.action IN ('login', 'logout')
 ORDER BY al.created_at DESC;
 
 COMMENT ON VIEW identity_audit.vw_logs_inicio_cierre_sesion

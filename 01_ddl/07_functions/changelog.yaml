@@ -31,22 +31,7 @@ databaseChangeLog:
             path: ../../05_rollbacks/01_ddl/07_functions/002_audit_log_functions_rollback.sql
             relativeToChangelogFile: true
             stripComments: false
-  - changeSet:
-      id: 5cb1bb1e-93c1-4564-ae7a-3fba427610e3
-      author: natalia chala
-      labels: "BD-01-dev,ddl,function"
-      comment: Creates functions for user configuration.
-      changes:
-        - sqlFile:
-            path: 003_config_user_functions.sql
-            relativeToChangelogFile: true
-            stripComments: false
-            splitStatements: false
-      rollback:
-        - sqlFile:
-            path: ../../05_rollbacks/01_ddl/07_functions/003_config_user_functions_rollback.sql
-            relativeToChangelogFile: true
-            stripComments: false
+
   - changeSet:
       id: 6a8b9c0d-1e2f-3g4h-5i6j-7k8l9m0n1o2p
       author: natalia chala

@@ -1,35 +1,97 @@
 -- ============================================================
--- GRANTS — Esquema config
+-- GRANTS - Esquema config
 -- Archivo: 03_dcl/01_grants/007_grants_config.sql
--- Descripción: Otorga privilegios sobre los objetos del
---              esquema config a los roles de PostgreSQL.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/007_create_config_tables.sql
+--
+-- Modelo:
+--   - config.user_preference
+--   - config.home_recommendation_preference
+--   - config.home_notification_preference
 -- ============================================================
 
-GRANT USAGE ON SCHEMA config TO smarthome_admin, smarthome_app, smarthome_readonly;
+GRANT USAGE ON SCHEMA config
+TO
+  smarthome_admin,
+  smarthome_app,
+  smarthome_ingest,
+  smarthome_worker;
 
--- smarthome_admin: acceso total
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA config TO smarthome_admin;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA config TO smarthome_admin;
+-- ============================================================
+-- config.user_preference
+-- ============================================================
 
--- smarthome_app: lectura y escritura
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA config TO smarthome_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA config TO smarthome_app;
+GRANT SELECT, INSERT
+ON TABLE config.user_preference
+TO
+  smarthome_admin,
+  smarthome_app;
 
--- smarthome_readonly: solo lectura
-GRANT SELECT ON ALL TABLES IN SCHEMA config TO smarthome_readonly;
+GRANT UPDATE (
+  language,
+  theme,
+  date_format,
+  time_format,
+  currency,
+  temperature_unit,
+  timezone
+)
+ON TABLE config.user_preference
+TO smarthome_app;
 
--- Aplicar a tablas futuras
-ALTER DEFAULT PRIVILEGES IN SCHEMA config
-  GRANT SELECT, INSERT, UPDATE ON TABLES TO smarthome_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA config
-  GRANT SELECT ON TABLES TO smarthome_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA config
-  GRANT ALL PRIVILEGES ON TABLES TO smarthome_admin;
+GRANT UPDATE
+ON TABLE config.user_preference
+TO smarthome_admin;
+
+-- ============================================================
+-- config.home_recommendation_preference
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE config.home_recommendation_preference
+TO
+  smarthome_admin,
+  smarthome_app;
+
+GRANT UPDATE (
+  recommendations_enabled,
+  recommendation_frequency
+)
+ON TABLE config.home_recommendation_preference
+TO smarthome_app;
+
+GRANT UPDATE
+ON TABLE config.home_recommendation_preference
+TO smarthome_admin;
+
+GRANT SELECT
+ON TABLE config.home_recommendation_preference
+TO smarthome_worker;
+
+-- ============================================================
+-- config.home_notification_preference
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE config.home_notification_preference
+TO
+  smarthome_admin,
+  smarthome_app;
+
+GRANT UPDATE (
+  notifications_enabled,
+  high_consumption_notifications,
+  device_notifications,
+  recommendation_notifications,
+  minimum_priority
+)
+ON TABLE config.home_notification_preference
+TO smarthome_app;
+
+GRANT UPDATE
+ON TABLE config.home_notification_preference
+TO smarthome_admin;
+
+GRANT SELECT
+ON TABLE config.home_notification_preference
+TO
+  smarthome_ingest,
+  smarthome_worker;

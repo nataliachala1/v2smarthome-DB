@@ -19,7 +19,7 @@ BEGIN;
 
   -- 1. Insertar nuevo hogar
   INSERT INTO homes.home (
-    id_home, id_user, nombre, estrato, estado, created_at, updated_at
+    id_home, id_user, nombre, estrato, status, created_at, updated_at
   )
   VALUES (
     :id_home, :id_user, :nombre, :estrato, 'activo', NOW(), NOW()

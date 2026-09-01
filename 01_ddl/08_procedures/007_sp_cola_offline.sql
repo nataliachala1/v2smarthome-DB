@@ -44,8 +44,8 @@ BEGIN
   -- 1. Registrar inicio de sincronización
   -- --------------------------------------------------------
   INSERT INTO sync.synchronization (
-    id_synchronization, id_user, tipo, estado,
-    dispositivos_sincronizados, created_at
+    id_synchronization, id_user, type, status,
+    synchronized_devices, created_at
   )
   VALUES (
     p_id_synchronization, p_id_user, 'manual', 'exitosa',
@@ -99,13 +99,13 @@ BEGIN
   -- --------------------------------------------------------
   UPDATE sync.synchronization
   SET
-    dispositivos_sincronizados = p_total_procesadas,
-    estado = CASE
+    synchronized_devices = p_total_procesadas,
+    status = CASE
                WHEN p_total_fallidas = 0 THEN 'exitosa'
                WHEN p_total_procesadas = 0 THEN 'fallida'
                ELSE 'parcial'
              END,
-    errores = CASE
+    errors = CASE
                 WHEN p_total_fallidas > 0
                 THEN CONCAT(p_total_fallidas, ' acción(es) no pudieron procesarse.')
                 ELSE NULL

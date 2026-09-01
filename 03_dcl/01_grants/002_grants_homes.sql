@@ -1,35 +1,108 @@
 -- ============================================================
--- GRANTS — Esquema homes
+-- GRANTS - Esquema homes
 -- Archivo: 03_dcl/01_grants/002_grants_homes.sql
--- Descripción: Otorga privilegios sobre los objetos del
---              esquema homes a los roles de PostgreSQL.
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/002_create_homes_tables.sql
+--
+-- Modelo:
+--   - homes.home
+--   - homes.zone
+--   - homes.electricity_tariff
+--   - homes.home_member
+--
+-- Principios:
+--   - NestJS utiliza smarthome_app.
+--   - OWNER/MEMBER/GUEST se restringen mediante RLS.
+--   - No se concede DELETE.
+--   - No se utilizan ALL TABLES ni ALTER DEFAULT PRIVILEGES.
 -- ============================================================
 
-GRANT USAGE ON SCHEMA homes TO smarthome_admin, smarthome_app, smarthome_readonly;
+GRANT USAGE ON SCHEMA homes
+TO
+  smarthome_admin,
+  smarthome_app,
+  smarthome_readonly;
 
--- smarthome_admin: acceso total
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA homes TO smarthome_admin;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA homes TO smarthome_admin;
+-- ============================================================
+-- homes.home
+-- ============================================================
 
--- smarthome_app: lectura y escritura
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA homes TO smarthome_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA homes TO smarthome_app;
+GRANT SELECT, INSERT
+ON TABLE homes.home
+TO smarthome_app;
 
--- smarthome_readonly: solo lectura
-GRANT SELECT ON ALL TABLES IN SCHEMA homes TO smarthome_readonly;
+GRANT UPDATE (
+  name,
+  stratum,
+  status,
+  updated_at,
+  deleted_at
+)
+ON TABLE homes.home
+TO smarthome_app;
 
--- Aplicar a tablas futuras
-ALTER DEFAULT PRIVILEGES IN SCHEMA homes
-  GRANT SELECT, INSERT, UPDATE ON TABLES TO smarthome_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA homes
-  GRANT SELECT ON TABLES TO smarthome_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA homes
-  GRANT ALL PRIVILEGES ON TABLES TO smarthome_admin;
+GRANT SELECT, INSERT, UPDATE
+ON TABLE homes.home
+TO smarthome_admin;
+
+-- ============================================================
+-- homes.zone
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE homes.zone
+TO smarthome_app;
+
+GRANT UPDATE (
+  name,
+  type,
+  updated_at,
+  deleted_at
+)
+ON TABLE homes.zone
+TO smarthome_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE homes.zone
+TO smarthome_admin;
+
+-- ============================================================
+-- homes.home_member
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE homes.home_member
+TO smarthome_app;
+
+GRANT UPDATE (
+  role,
+  status,
+  accepted_at,
+  ended_at,
+  updated_at
+)
+ON TABLE homes.home_member
+TO smarthome_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE homes.home_member
+TO smarthome_admin;
+
+-- ============================================================
+-- homes.electricity_tariff
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE homes.electricity_tariff
+TO smarthome_app;
+
+GRANT UPDATE (
+  price_per_kwh,
+  currency,
+  valid_from,
+  valid_to
+)
+ON TABLE homes.electricity_tariff
+TO smarthome_app;
+
+GRANT SELECT, INSERT, UPDATE
+ON TABLE homes.electricity_tariff
+TO smarthome_admin;

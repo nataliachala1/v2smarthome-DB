@@ -2,7 +2,7 @@
 BEGIN;
 
   UPDATE sync.synchronization
-  SET estado = 'fallido', updated_at = NOW()
+  SET status = 'fallido', updated_at = NOW()
   WHERE id_synchronization = :id_synchronization;
 
   INSERT INTO identity_audit.audit_log (

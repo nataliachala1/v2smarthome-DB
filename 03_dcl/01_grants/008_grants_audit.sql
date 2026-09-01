@@ -1,39 +1,59 @@
 -- ============================================================
--- GRANTS — esquema identity_audit
+-- GRANTS — Esquema identity_audit
 -- Archivo: 03_dcl/01_grants/008_grants_audit.sql
--- Descripción: Otorga privilegios sobre los objetos del
---              esquema identity_audit a los roles de PostgreSQL.
---              ESPECIAL: smarthome_app solo puede SELECT
---              e INSERT. Nunca UPDATE ni DELETE para
---              garantizar la inmutabilidad de los logs
---              (RNF8.2).
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 03_dcl/00_roles/001_create_roles.sql
---               01_ddl/03_tables/008_create_audit_tables.sql
+--
+-- Modelo:
+--   - identity_audit.audit_log
+--
+-- Principios:
+--   - NestJS registra eventos semánticos.
+--   - PostgreSQL protege su integridad.
+--   - smarthome_app puede INSERT.
+--   - smarthome_app puede SELECT únicamente sujeto a RLS.
+--   - Solo SYSTEM_ADMIN podrá consultar mediante RLS.
+--   - No UPDATE.
+--   - No DELETE.
+--   - No ALL TABLES.
+--   - No ALL PRIVILEGES.
+--   - No ALTER DEFAULT PRIVILEGES.
 -- ============================================================
 
-GRANT USAGE ON SCHEMA identity_audit TO smarthome_admin, smarthome_app, smarthome_readonly;
 
--- smarthome_admin: acceso total
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA identity_audit TO smarthome_admin;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA identity_audit TO smarthome_admin;
+-- ============================================================
+-- ACCESO AL ESQUEMA
+-- ============================================================
 
--- smarthome_app: solo insertar y consultar (NO UPDATE, NO DELETE)
-GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA identity_audit TO smarthome_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA identity_audit TO smarthome_app;
+GRANT USAGE ON SCHEMA identity_audit
+TO
+  smarthome_admin,
+  smarthome_app;
 
--- smarthome_readonly: solo lectura
-GRANT SELECT ON ALL TABLES IN SCHEMA identity_audit TO smarthome_readonly;
 
--- Aplicar a tablas futuras
-ALTER DEFAULT PRIVILEGES IN SCHEMA identity_audit
-  GRANT SELECT, INSERT ON TABLES TO smarthome_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA identity_audit
-  GRANT SELECT ON TABLES TO smarthome_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA identity_audit
-  GRANT ALL PRIVILEGES ON TABLES TO smarthome_admin;
+-- ============================================================
+-- identity_audit.audit_log
+--
+-- smarthome_app:
+--   INSERT -> registrar eventos generados por NestJS.
+--   SELECT -> únicamente cuando RLS determine SYSTEM_ADMIN.
+--
+-- Nunca puede:
+--   UPDATE
+--   DELETE
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE identity_audit.audit_log
+TO smarthome_app;
+
+
+-- ============================================================
+-- Administración técnica
+--
+-- Puede consultar y registrar eventos técnicos.
+-- Tampoco recibe UPDATE ni DELETE para preservar
+-- la inmutabilidad del histórico.
+-- ============================================================
+
+GRANT SELECT, INSERT
+ON TABLE identity_audit.audit_log
+TO smarthome_admin;

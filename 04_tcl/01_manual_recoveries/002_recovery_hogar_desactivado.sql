@@ -2,8 +2,8 @@
 BEGIN;
 
   UPDATE homes.home
-  SET estado = 'activo', updated_at = NOW()
-  WHERE id_home = :id_home AND estado = 'desactivado';
+  SET status = 'activo', updated_at = NOW()
+  WHERE id_home = :id_home AND status = 'desactivado';
 
   INSERT INTO identity_audit.audit_log (
     id_audit_log, id_user, accion, modulo,
