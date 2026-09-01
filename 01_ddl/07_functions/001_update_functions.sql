@@ -1,25 +1,23 @@
 -- ============================================================
--- FUNCIÓN: fn_updated_at
--- Archivo: 01_ddl/05_functions/001_fn_updated_at.sql
--- Descripción: Función genérica que actualiza automáticamente
---              el campo updated_at al momento exacto en que
---              se modifica cualquier registro. Se reutiliza
---              en todas las tablas que tienen este campo
--- Autor: Karen Daniela Holguín Cruz, Natalia Chala Chala,
---        Kevin Stiven López Amaya
--- Institución: SENA — Análisis y Desarrollo de Software
--- Ficha: 3145555
--- Versión: 1.0.0
--- Fecha: 2025
--- Dependencias: 01_schemas
+-- FUNCIONES TECNICAS - updated_at
+-- Archivo: 01_ddl/07_functions/001_update_functions.sql
+--
+-- Responsabilidad:
+--   Mantener updated_at mediante triggers tecnicos.
+--
+-- No contiene logica de negocio.
+-- No utiliza SECURITY DEFINER.
 -- ============================================================
 
-CREATE OR REPLACE FUNCTION fn_updated_at()
+CREATE OR REPLACE FUNCTION public.fn_set_updated_at()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
 END;
 $$;
+
+COMMENT ON FUNCTION public.fn_set_updated_at()
+IS 'Trigger function tecnica que actualiza NEW.updated_at antes de persistir un UPDATE.';

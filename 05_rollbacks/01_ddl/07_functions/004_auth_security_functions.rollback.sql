@@ -1,1 +1,7 @@
-DROP FUNCTION IF EXISTS fn_auth_intentos_fallidos() CASCADE;
+-- ============================================================
+-- ROLLBACK - funciones tecnicas auth
+-- ============================================================
+
+DROP FUNCTION IF EXISTS auth.fn_is_system_admin();
+DROP FUNCTION IF EXISTS auth.fn_is_active_user(UUID);
+DROP FUNCTION IF EXISTS auth.fn_current_user_id();

@@ -8,6 +8,3 @@ databaseChangeLog:
   - include:
       file: ../03_dcl/changelog.yaml
       relativeToChangelogFile: true
-  - include:
-      file: ../04_tcl/changelog.yaml
-      relativeToChangelogFile: true

@@ -1,5 +1,5 @@
 -- ============================================================
--- ROLLBACK - updated_at
+-- ROLLBACK - helper RLS consumption
 -- ============================================================
 
-DROP FUNCTION IF EXISTS public.fn_set_updated_at();
+DROP FUNCTION IF EXISTS devices.fn_device_belongs_to_home(UUID, UUID);

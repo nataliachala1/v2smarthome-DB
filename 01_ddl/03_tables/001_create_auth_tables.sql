@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS auth.user (
   updated_at            TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
 
   CONSTRAINT pk_user                 PRIMARY KEY (id_user),
-  CONSTRAINT uq_user_name            UNIQUE (name),
   CONSTRAINT ck_user_status          CHECK (status IN ('PENDING', 'ACTIVE', 'DEACTIVATED', 'LOCKED')),
   CONSTRAINT ck_user_failed_attempts CHECK (failed_login_attempts >= 0)
 );

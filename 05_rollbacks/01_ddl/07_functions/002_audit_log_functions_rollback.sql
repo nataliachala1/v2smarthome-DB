@@ -1,1 +1,0 @@
-DROP FUNCTION IF EXISTS fn_audit_log() CASCADE;
