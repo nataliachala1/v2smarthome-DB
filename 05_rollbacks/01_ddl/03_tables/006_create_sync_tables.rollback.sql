@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS sync.synchronization CASCADE;
+DROP TABLE IF EXISTS sync.backup CASCADE;

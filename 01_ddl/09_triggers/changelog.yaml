@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0306b884-955b-4f12-9f52-6105ace155de
+      author: natalia chala
+      labels: "BD-01-dev,ddl,trigger"
+      comment: Creates triggers for updated_at maintenance.
+      changes:
+        - sqlFile:
+            path: 001_update_triggers.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+  - changeSet:
+      id: 44fb4e04-e838-46d4-94c7-4aadfea1b1fb
+      author: natalia chala
+      labels: "BD-01-dev,ddl,trigger"
+      comment: Creates triggers for audit logging.
+      changes:
+        - sqlFile:
+            path: 002_audit_log_triggers.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false
+
+  - changeSet:
+      id: f48415fc-1a9f-414a-ad51-b9820ec6f41f
+      author: natalia chala
+      labels: "BD-01-dev,ddl,trigger"
+      comment: Creates triggers for auth security.
+      changes:
+        - sqlFile:
+            path: 004_auth_security_triggers.sql
+            relativeToChangelogFile: true
+            stripComments: false
+            splitStatements: false

@@ -1,0 +1,3 @@
+DROP VIEW IF EXIST ADDS homes.vw_homes CASCADE;
+
+DROP VIEW IF EXIST ADDS homes.vw_zones CASCADE;

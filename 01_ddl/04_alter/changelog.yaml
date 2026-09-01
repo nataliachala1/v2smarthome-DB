@@ -1,0 +1,136 @@
+databaseChangeLog:
+  - changeSet:
+      id: a00ac303-9af8-4292-bc3d-7b7600190f51
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the auth schema.
+      changes:
+        - sqlFile:
+            path: 001_add_alter_auth.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/001_add_alter_auth.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: ea9f510a-51ea-4ccc-a56a-b42ce0fc1991
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the homes schema.
+      changes:
+        - sqlFile:
+            path: 002_add_alter_homes.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/002_add_alter_homes.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 9d8dd52d-cd9f-48f1-b8df-94ccdcf1dd1a
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the devices schema.
+      changes:
+        - sqlFile:
+            path: 003_add_alter_devices.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/003_add_alter_devices.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 406c6541-bc69-4623-9793-044292f42fd0
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the consumption schema.
+      changes:
+        - sqlFile:
+            path: 004_add_alter_consumption.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/004_add_alter_consumption.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 74496839-d385-4921-9935-c2954ffcf0ba
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the notifications schema.
+      changes:
+        - sqlFile:
+            path: 005_add_alter_notifications.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/005_add_alter_notifications.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: fe3e0fc3-6a61-4dac-b43c-e50a722879c7
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the sync schema.
+      changes:
+        - sqlFile:
+            path: 006_add_alter_sync.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/006_add_alter_sync.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 5c14a249-6430-4623-8e75-a2464c12e220
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the identity_audit schema.
+      changes:
+        - sqlFile:
+            path: 007_add_alter_identity_audit.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/007_add_alter_identity_audit.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 60601cbe-9927-4911-9807-1d5f5389c221
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Adds foreign keys for the config schema.
+      changes:
+        - sqlFile:
+            path: 008_add_alter_config.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/008_add_alter_config.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: d9a0f43b-7382-4aba-a3c5-935c6dc80ca5
+      author: natalia chala
+      labels: "BD-01-dev,ddl,alter,foreign-key"
+      comment: Ensures a device zone belongs to the same home as the device.
+      changes:
+        - sqlFile:
+            path: 009_add_alter_home_device_integrity.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/009_add_alter_home_device_integrity.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false

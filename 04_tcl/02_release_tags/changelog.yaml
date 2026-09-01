@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: d5087a1c-b03c-4528-a1b3-52aeec46d209
+      author: natalia chala
+      labels: "BD-01-dev,tcl,release"
+      comment: Registers the v1.0.0 initial release tag.
+      changes:
+        - sqlFile:
+            path: 001_tag_v1_0_0_initial.sql
+            relativeToChangelogFile: true
+            stripComments: false
+  - changeSet:
+      id: 118d11bc-b3cf-4140-a72d-fb8157b96aa8
+      author: natalia chala
+      labels: "BD-01-dev,tcl,release"
+      comment: Registers the v1.0.1 seed release tag.
+      changes:
+        - sqlFile:
+            path: 002_tag_v1_0_1_seed.sql
+            relativeToChangelogFile: true
+            stripComments: false

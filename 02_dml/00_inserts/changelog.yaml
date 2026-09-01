@@ -1,0 +1,33 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: f05791d4-969d-444f-8892-3087e1fab648
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds application roles.
+      changes:
+        - sqlFile:
+            path: 001_insert_roles.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/02_dml/00_inserts/001_insert_roles.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+
+  - changeSet:
+      id: dd406ee7-34c0-416d-befe-52254f5cab75
+      author: natalia chala
+      labels: "BD-01-dev,dml,insert"
+      comment: Seeds device types.
+      changes:
+        - sqlFile:
+            path: 004_insert_tipos_dispositivos.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/02_dml/00_inserts/004_insert_tipos_dispositivos.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
